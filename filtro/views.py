@@ -28,6 +28,7 @@ from .forms import (
     FiltroForm,
     AdicionarClasseForm,
     ItemFiltroForm,
+    FiltroNumProcessos,
 )
 from filtro.models import (
     Filtro,
@@ -177,6 +178,7 @@ def adicionar_filtro(request):
 def filtro(request, idfiltro):
     m_filtro = obter_filtro(idfiltro, request.user.username)
     form = FiltroForm(instance=m_filtro)
+    form_proc = FiltroNumProcessos()
 
     if request.method == 'POST':
         form = FiltroForm(
@@ -194,6 +196,7 @@ def filtro(request, idfiltro):
         'filtro/filtro.html',
         {
             'form': form,
+            'form_proc': form_proc,
             'model': m_filtro,
             'idfiltro': idfiltro,
             'adicionarclasseform': AdicionarClasseForm(),
@@ -268,11 +271,11 @@ def excluir_classe(request, idfiltro, idclasse):
     messages.warning(request, 'Classe de filtro removida')
 
     return redirect(
-            reverse(
-                'filtros-filtro',
-                args=[idfiltro]
-            )
+        reverse(
+            'filtros-filtro',
+            args=[idfiltro]
         )
+    )
 
 
 @login_required
@@ -431,9 +434,9 @@ def listar_resultados(request, idfiltro):
 
     for item in sumario:
         item['percentual_classe'] = 0 if not total_classificados \
-            else (item['total'] * 100.0)/total_classificados
+            else (item['total'] * 100.0) / total_classificados
         item['percentual_total'] = 0 if not total_documentos \
-            else (item['total'] * 100.0)/total_documentos
+            else (item['total'] * 100.0) / total_documentos
 
     if classe == 'T':
         documentos = documentos.all()

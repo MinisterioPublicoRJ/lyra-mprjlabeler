@@ -9,7 +9,6 @@ from .functions import (
     obtem_classe
 )
 
-
 __all__ = [
     'limpar_documentos',
     'parse_documentos',
@@ -18,5 +17,5 @@ __all__ = [
     'obtem_documento_final',
     'montar_estrutura_filtro',
     'preparar_classificadores',
-    'obtem_classe'
+    'obtem_classe',
 ]
