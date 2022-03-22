@@ -28,7 +28,7 @@ from .forms import (
     FiltroForm,
     AdicionarClasseForm,
     ItemFiltroForm,
-    FiltroNumProcessos,
+    # FiltroNumProcessos,
 )
 from filtro.models import (
     Filtro,
@@ -44,7 +44,7 @@ from .tasks import (
 from .task_utils.functions import montar_estrutura_filtro
 
 
-def obter_filtro(idfiltro, username, responsavel=False):
+def obter_filtro(idfiltro, username, responsavel=True):
     base = obter_filtros(username, responsavel)
 
     return get_object_or_404(
@@ -53,7 +53,7 @@ def obter_filtro(idfiltro, username, responsavel=False):
     )
 
 
-def obter_filtros(username, responsavel=False):
+def obter_filtros(username, responsavel=True):
     if responsavel:
         return Filtro.objects.filter(responsavel=username)
 
@@ -178,7 +178,7 @@ def adicionar_filtro(request):
 def filtro(request, idfiltro):
     m_filtro = obter_filtro(idfiltro, request.user.username)
     form = FiltroForm(instance=m_filtro)
-    form_proc = FiltroNumProcessos()
+    # form_proc = FiltroNumProcessos()
 
     if request.method == 'POST':
         form = FiltroForm(
@@ -196,7 +196,7 @@ def filtro(request, idfiltro):
         'filtro/filtro.html',
         {
             'form': form,
-            'form_proc': form_proc,
+            # 'form_proc': form_proc,
             'model': m_filtro,
             'idfiltro': idfiltro,
             'adicionarclasseform': AdicionarClasseForm(),
@@ -361,7 +361,8 @@ def excluir_item_filtro(request, idfiltro, iditemfiltro):
 @login_required
 @require_http_methods(['GET'])
 def classificar(request, idfiltro):
-    submeter_classificacao.delay(idfiltro)
+    # submeter_classificacao.delay(idfiltro)
+    submeter_classificacao(idfiltro)
 
     messages.info(
         request,

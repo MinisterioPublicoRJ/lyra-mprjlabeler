@@ -2,12 +2,12 @@ from django.db import models
 from ordered_model.models import OrderedModel
 from .storages import OverwriteStorage
 
+# from .task_utils.obter_num_processo import obter_list_cnpj_cpf
 
 TIPOS_RASPADOR = (
     ('1', 'Tribunal de Justiça do Rio de Janeiro'),
     ('2', 'Arquivo Tabulado'),
 )
-
 
 SITUACOES_FILTRO = (
     ('1', 'Em Criação'),
@@ -26,6 +26,16 @@ TIPOS_FILTRO = (
     ('4', 'Termos de Invalidação'),
     ('5', 'Termos de Reforço'),
 )
+
+CNPJ_CPF = (('02421421000111', '02421421000111'),
+('00000000000191', '00000000000191'), ('00000000000515', '00000000000515'), ('00000000004774', '00000000004774'),
+('00000000007285', '00000000007285'), ('00000000007447', '00000000007447'), ('00000000008176', '00000000008176'),
+('00000000008761', '00000000008761'), ('00000000009148', '00000000009148'), ('00000000011398', '00000000011398'),
+('00000000012793', '00000000012793'), ('00000000013170', '00000000013170'), ('00000000015032', '00000000015032'),
+('00000000024961', '00000000024961'), ('00000000025852', '00000000025852'), ('00000000026239', '00000000026239'),
+('00000000028797', '00000000028797'), ('00000000028878', '00000000028878'), ('00000000029688', '00000000029688'),
+('00000000031232', '00000000031232'), ('00000000039217', '00000000039217'), ('00000000039489', '00000000039489'),
+('00000000041890', '00000000041890'), ('00000000043591', '00000000043591'), ('00000000046930', '00000000046930'),)
 
 
 class TipoMovimento(models.Model):
@@ -56,6 +66,12 @@ class Filtro(models.Model):
     saida_lda = models.TextField(null=True, blank=True)
     responsavel = models.CharField(max_length=50, default='')
     percentual_atual = models.FloatField(null=True, blank=True)
+    reu = models.CharField(
+        max_length=100,
+        choices=CNPJ_CPF,
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         if self:

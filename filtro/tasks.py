@@ -27,6 +27,7 @@ from .task_utils import (
     parse_documentos,
     preparar_classificadores,
 )
+from filtro.task_utils.obter_num_processo import obter_numeros_processos
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -52,7 +53,10 @@ def submeter_classificacao_tjrj(m_filtro, idfiltro):
     )
 
     # Obtém todos os números de documentos
-    numeros_documentos = parse_documentos(m_filtro)
+    if m_filtro.reu:
+        numeros_documentos = obter_numeros_processos(m_filtro.reu)
+    else:
+        numeros_documentos = parse_documentos(m_filtro)
 
     # Baixa os processos
     contador = 0
@@ -121,7 +125,7 @@ def submeter_classificacao_arquivotabulado(m_filtro, idfiltro):
     classificar_baixados.delay(idfiltro)
 
 
-@shared_task
+# @shared_task
 def submeter_classificacao(idfiltro):
     logger.info("Processando filtro %s" % idfiltro)
     m_filtro = Filtro.objects.get(pk=idfiltro)
@@ -190,7 +194,8 @@ def classificar_baixados(idfiltro):
     logger.info("Contando a quantidade de documento")
     qtd_documentos = documentos.count()
     pool = Pool(
-        cpu_count(),
+        # cpu_count(),
+        2,
         initializer=classificador_inicializador,
         initargs=(estrutura,),
     )
@@ -198,7 +203,8 @@ def classificar_baixados(idfiltro):
     contador = 0
     logger.info(
         "Aplicando classificadores em paralelo: %s chunks em %s nucleos"
-        % (settings.CLASSIFICADOR_CHUNKSIZE, cpu_count())
+        # % (settings.CLASSIFICADOR_CHUNKSIZE, cpu_count())
+        % (settings.CLASSIFICADOR_CHUNKSIZE, 2)
     )
     for documento in pool.imap(
         classificar_paralelo,

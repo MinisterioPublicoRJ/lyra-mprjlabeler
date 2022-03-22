@@ -7,7 +7,7 @@ from .models import (
     ItemFiltro
 )
 
-from filtro.task_utils.obter_num_processo import obter_list_cnpj_cpf
+# from filtro.task_utils.obter_num_processo import obter_list_cnpj_cpf
 
 
 class BaseModelForm(forms.ModelForm):
@@ -44,7 +44,8 @@ class FiltroForm(BaseModelForm):
             'nome',
             'tipo_raspador',
             'tipos_movimento',
-            'arquivo_documentos'
+            'arquivo_documentos',
+            'reu',
         ]
 
 
@@ -94,11 +95,15 @@ class ItemFiltroForm(BaseModelForm):
         fields = ['termos', 'tipo', 'regex']
 
 
-class FiltroNumProcessos(forms.Form):
-    """ """
-    cnpj = obter_list_cnpj_cpf()[:100] # Limitando a 100 itens
-    numeros_processo = forms.ChoiceField(label='N processos', widget=forms.Select(
-        attrs={'class': 'fselectpicker form-control',
-               'data-style': 'form-control',
-               'title': 'Selecione as Opções Desejadas'}), choices=cnpj,
-                                         )
+# class FiltroNumProcessos(forms.Form):
+#     """ """
+#     cnpj = obter_list_cnpj_cpf()[:100]  # Limitando a 100 itens
+#     numeros_processo = forms.ChoiceField(
+#         label='N processos',
+#         widget=forms.Select(
+#             attrs={'class': 'fselectpicker form-control',
+#                    'data-style': 'form-control',
+#                    'title': 'Selecione as Opções Desejadas'}
+#         ),
+#         choices=cnpj,
+#     )

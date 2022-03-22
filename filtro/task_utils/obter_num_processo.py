@@ -62,12 +62,13 @@ def obter_numeros_processos(cnpj_cpf):
     list_processos = []
     for row in list_data_full:
         if row.cnpj_cpf == cnpj_cpf:
-            list_processos.append(row.numero_processo)
+            list_processos.append(row.numero_processo.replace('.','').replace('-','') +'\n')
     return list_processos
 
 if __name__ == '__main__':
     print(obter_list_cnpj_cpf())
-    print(obter_numeros_processos('94846755000155'))
+    # print(obter_numeros_processos('94846755000155'))
+    print(obter_numeros_processos('00000000000191'))
     # procs.obter_numeros_processos('00000000000191')
 
 # 94846755000155
