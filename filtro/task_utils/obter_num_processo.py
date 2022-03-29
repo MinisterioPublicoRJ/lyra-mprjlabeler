@@ -13,10 +13,9 @@ from collections import namedtuple
 
 def processa_arquivo():
     root_path = Path(__file__).parent.absolute()
-    # arquivo_dicionario = Path(root_path, 'dicionario.txt')
     file = Path(root_path, 'novas_acoes_individuais_consumeristas_2_parcial_4.csv')
     list_data_full = []
-    with open(file, 'r') as f:
+    with open(file, 'r', encoding='ISO-8859-1') as f:
         data_full = csv.reader(f, delimiter=';')
 
         # Processando arquivo
@@ -62,8 +61,9 @@ def obter_numeros_processos(cnpj_cpf):
     list_processos = []
     for row in list_data_full:
         if row.cnpj_cpf == cnpj_cpf:
-            list_processos.append(row.numero_processo.replace('.','').replace('-','') +'\n')
+            list_processos.append(row.numero_processo.replace('.', '').replace('-', '') + '\n')
     return list_processos
+
 
 if __name__ == '__main__':
     print(obter_list_cnpj_cpf())
