@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
 DEV_PARTY_APPS = [
     'debug_toolbar',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -170,8 +171,26 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-celery_dev = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
-CELERY_BROKER_URL = config('CELERY_URL', default=celery_dev, cast=dburl)
+# # ### Celery
+# celery_dev = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
+# CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_BROKER_URL = config('CELERY_URL', default=celery_dev, cast=dburl)
+
+
+# Celery settings
+
+# CELERY_BROKER_URL = 'sqla+sqlite:///' + os.path.join(BASE_DIR, 'broker.sqlite')
+celery_dev = "{proc_tranport}{path}".format(proc_tranport='sqlite:///',
+                                            path=os.path.join(BASE_DIR, 'broker.sqlite'))
+# CELERY_BROKER_URL = 'sqla+sqlite:///' + os.path.join(BASE_DIR, 'broker.sqlite')
+CELERY_BROKER_URL = config('CELERY_URL')
+
+#: Only add pickle to this list if your broker is secured
+#: from unwanted access (see userguide/security.html)
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_RESULT_BACKEND = 'db+sqlite:///' + os.path.join(BASE_DIR, 'results.sqlite')
+# CELERY_TASK_SERIALIZER = 'json'
+
 CELERY_TASK_QUEUE = config("CELERY_QUEUE", None)
 
 if config("AMBIENTE", None) == "producao":
@@ -190,7 +209,6 @@ SENHA_MNI = config("SENHA_MNI")
 
 NOME_FILTRO_PETICAO_INICIAL = "Petição inicial"
 MININUM_DOC_COUNT_LDA = config("MININUM_DOC_COUNT_LDA", cast=int, default=1_000)
-
 
 LOGGING = {
     'version': 1,
