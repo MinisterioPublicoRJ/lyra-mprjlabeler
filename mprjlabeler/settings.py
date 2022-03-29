@@ -15,6 +15,7 @@ import sys
 from dj_database_url import parse as db_url
 from django.contrib import messages
 from decouple import config
+from dj_database_url import parse as dburl
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -100,22 +101,20 @@ WSGI_APPLICATION = 'mprjlabeler.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+default_dburl = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
+
 TESTING = sys.argv[1:2] == ['test']
 if not TESTING:
     DATABASES = {
-        'default': config(
-            'DATABASE_URL',
-            cast=db_url
-        )
+        'default': config('DATABASE_URL', default=default_dburl, cast=db_url)
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            "TEST": {
-                "NAME": os.path.join(BASE_DIR, "test_db.sqlite3"),
-            }
-        }, }
+        'default': {'ENGINE': 'django.db.backends.sqlite3',
+                    "TEST": {
+                        "NAME": os.path.join(BASE_DIR, "test_db.sqlite3"),
+                    }
+                    }, }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -171,7 +170,8 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-CELERY_BROKER_URL = config("CELERY_URL", None)
+celery_dev = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
+CELERY_BROKER_URL = config('CELERY_URL', default=celery_dev, cast=dburl)
 CELERY_TASK_QUEUE = config("CELERY_QUEUE", None)
 
 if config("AMBIENTE", None) == "producao":
@@ -190,3 +190,20 @@ SENHA_MNI = config("SENHA_MNI")
 
 NOME_FILTRO_PETICAO_INICIAL = "Petição inicial"
 MININUM_DOC_COUNT_LDA = config("MININUM_DOC_COUNT_LDA", cast=int, default=1_000)
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'filtro': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
