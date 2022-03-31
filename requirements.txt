@@ -6,6 +6,7 @@ Django==4.0.3
 django-nested-admin==3.4.0
 django-ordered-model==3.5
 django-yamlfield==1.1.0
+django-debug-toolbar
 gunicorn==20.1.0
 idna==3.3
 newrelic==7.6.0.173
@@ -24,3 +25,4 @@ pyLDAvis==3.3.1
 python-decouple
 processostjrj@git+https://github.com/MinisterioPublicoRJ/processostjrj.git@test/debugging
 classificador-lyra@git+https://github.com/MinisterioPublicoRJ/classificador-lyra.git@test/debugging
+
