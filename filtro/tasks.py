@@ -8,6 +8,7 @@ from tarfile import TarFile, TarInfo
 
 import urllib3
 from billiard.pool import Pool, cpu_count
+# from billiard.pool import Pool
 from celery import shared_task
 from classificador_lyra.regex import classifica_item_sequencial
 from django.conf import settings
@@ -31,11 +32,9 @@ from filtro.task_utils.obter_num_processo import obter_numeros_processos
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-
 logger = logging.getLogger(__name__)
 # configuracao de tamanho maximo de campo csv disponivel na arquitetura
 csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
-
 
 SITUACOES_EXECUTORES = "246"
 
@@ -65,7 +64,7 @@ def submeter_classificacao_tjrj(m_filtro, idfiltro):
         nome=settings.NOME_FILTRO_PETICAO_INICIAL
     ).exists()
     for numero, processo, iniciais in download_processos(
-        numeros_documentos, trazer_iniciais=trazer_iniciais
+            numeros_documentos, trazer_iniciais=trazer_iniciais
     ):
         contador += 1
         logger.info("Passo %s, processo %s" % (contador, numero))
@@ -125,7 +124,7 @@ def submeter_classificacao_arquivotabulado(m_filtro, idfiltro):
     classificar_baixados.delay(idfiltro)
 
 
-# @shared_task
+@shared_task
 def submeter_classificacao(idfiltro):
     logger.info("Processando filtro %s" % idfiltro)
     m_filtro = Filtro.objects.get(pk=idfiltro)
@@ -194,8 +193,7 @@ def classificar_baixados(idfiltro):
     logger.info("Contando a quantidade de documento")
     qtd_documentos = documentos.count()
     pool = Pool(
-        # cpu_count(),
-        2,
+        cpu_count(),
         initializer=classificador_inicializador,
         initargs=(estrutura,),
     )
@@ -203,13 +201,12 @@ def classificar_baixados(idfiltro):
     contador = 0
     logger.info(
         "Aplicando classificadores em paralelo: %s chunks em %s nucleos"
-        # % (settings.CLASSIFICADOR_CHUNKSIZE, cpu_count())
-        % (settings.CLASSIFICADOR_CHUNKSIZE, 2)
+        % (settings.CLASSIFICADOR_CHUNKSIZE, cpu_count())
     )
     for documento in pool.imap(
-        classificar_paralelo,
-        iterador,
-        chunksize=settings.CLASSIFICADOR_CHUNKSIZE,
+            classificar_paralelo,
+            iterador,
+            chunksize=settings.CLASSIFICADOR_CHUNKSIZE,
     ):
         contador += 1
         m_filtro.percentual_atual = contador / qtd_documentos * 100
@@ -230,8 +227,8 @@ def classificar_baixados(idfiltro):
 def aplicar_lda(m_filtro):
     conteudos = (
         m_filtro.documento_set.filter(classe_filtro__isnull=True)
-        .all()
-        .values_list("conteudo", flat=True)
+            .all()
+            .values_list("conteudo", flat=True)
     )
 
     if len(conteudos) >= settings.MININUM_DOC_COUNT_LDA:
