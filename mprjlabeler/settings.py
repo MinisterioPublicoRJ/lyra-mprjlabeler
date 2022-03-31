@@ -185,6 +185,21 @@ celery_dev = "{proc_tranport}{path}".format(proc_tranport='sqlite:///',
 # CELERY_BROKER_URL = 'sqla+sqlite:///' + os.path.join(BASE_DIR, 'broker.sqlite')
 CELERY_BROKER_URL = config('CELERY_URL')
 
+
+CELERY_CONFIG = {
+    "CELERY_TASK_SERIALIZER": "json",
+    "CELERY_ACCEPT_CONTENT": ["json"],
+    "CELERY_RESULT_SERIALIZER": "json",
+    "CELERY_RESULT_BACKEND": None,
+    "CELERY_TIMEZONE": "America/Sao_Paulo",
+    "CELERY_ENABLE_UTC": True,
+    "CELERY_ENABLE_REMOTE_CONTROL": False,
+}
+
+
+
+
+
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
 # CELERY_ACCEPT_CONTENT = ['json']
