@@ -61,7 +61,8 @@ def obter_numeros_processos(cnpj_cpf):
     list_processos = []
     for row in list_data_full:
         if row.cnpj_cpf == cnpj_cpf:
-            list_processos.append(row.numero_processo.replace('.', '').replace('-', '') + '\n')
+            # + '\n'
+            list_processos.append(row.numero_processo.replace('.', '').replace('-', ''))
     return list_processos
 
 
