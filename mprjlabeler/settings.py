@@ -176,32 +176,12 @@ MESSAGE_TAGS = {
 # # ### Celery
 CELERY_TASK_QUEUE = config("CELERY_QUEUE", None)
 
-CELERY_BROKER_URL = 'sqs://{AWS_ACCESS_KEY_ID}:{AWS_SECRET_ACCESS_KEY}@'.format(
-    AWS_ACCESS_KEY_ID=quote(config('AWS_ACCESS_KEY_ID'), safe=''),
-    AWS_SECRET_ACCESS_KEY=quote(config('AWS_SECRET_ACCESS_KEY'), safe='')
-    )
-
-BROKER_URL = CELERY_BROKER_URL
-
-BROKER_TRANSPORT = 'sqs'
-BROKER_TRANSPORT_OPTIONS = {
-    'region': 'us-east-1',
-}
-
-CELERY_DEFAULT_QUEUE = config("CELERY_QUEUE", None)
-CELERY_QUEUES = {
-    CELERY_DEFAULT_QUEUE: {
-        'exchange': CELERY_DEFAULT_QUEUE,
-        'binding_key': CELERY_DEFAULT_QUEUE,
-    }
-}
-
-#: Only add pickle to this list if your broker is secured
-#: from unwanted access (see userguide/security.html)
-CELERY_ACCEPT_CONTENT = ['json']
+CELERY_BROKER_URL = 'sqla+sqlite:///' + os.path.join(BASE_DIR, 'broker.sqlite')
 CELERY_RESULT_BACKEND = 'db+sqlite:///' + os.path.join(BASE_DIR, 'results.sqlite')
+CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-
+CELERY_RESULT_SERIALIZER = 'json'
+# CELERY_TIMEZONE = 'Africa/Nairobi'
 
 if config("AMBIENTE", None) == "producao":
     DEBUG = False

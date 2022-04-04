@@ -362,7 +362,6 @@ def excluir_item_filtro(request, idfiltro, iditemfiltro):
 @require_http_methods(['GET'])
 def classificar(request, idfiltro):
     submeter_classificacao.delay(idfiltro)
-    # submeter_classificacao(idfiltro)
 
     messages.info(
         request,
