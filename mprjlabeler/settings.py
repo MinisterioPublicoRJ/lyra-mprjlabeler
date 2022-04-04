@@ -176,15 +176,17 @@ MESSAGE_TAGS = {
 # # ### Celery
 CELERY_TASK_QUEUE = config("CELERY_QUEUE", None)
 
-CELERY_BROKER_URL = 'sqla+sqlite:///' + os.path.join(BASE_DIR, 'broker.sqlite')
-CELERY_RESULT_BACKEND = 'db+sqlite:///' + os.path.join(BASE_DIR, 'results.sqlite')
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_TIMEZONE = 'Africa/Nairobi'
+broker = 'sqla+sqlite:///' + os.path.join(BASE_DIR, 'broker.sqlite')
+CELERY_BROKER_URL = config('CELERY_URL', default=broker)
 
 if config("AMBIENTE", None) == "producao":
     DEBUG = False
+
+    # ### Celery
+    CELERY_RESULT_BACKEND = 'db+sqlite:///' + os.path.join(BASE_DIR, 'results.sqlite')
+    CELERY_ACCEPT_CONTENT = ['json']
+    CELERY_TASK_SERIALIZER = 'json'
+    CELERY_RESULT_SERIALIZER = 'json'
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
