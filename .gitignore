@@ -8,6 +8,9 @@
 tsconfig.json
 jsconfig.json
 
+### Pycharm ###
+.idea/
+
 ### Django ###
 *.log
 *.pot
@@ -48,6 +51,9 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+bin/
+share/
+include/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -58,6 +64,7 @@ wheels/
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
+
 
 # Unit test / coverage reports
 htmlcov/
@@ -107,6 +114,8 @@ venv*/
 ENV/
 env.bak/
 venv.bak/
+pyvenv.cfg
+.venv_lyra
 
 # Spyder project settings
 .spyderproject
@@ -123,3 +132,6 @@ venv.bak/
 
 
 # End of https://www.gitignore.io/api/code,django,python
+settings.ini
+postgresdata
+redisdata

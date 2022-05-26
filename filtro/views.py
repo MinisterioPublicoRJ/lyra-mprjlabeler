@@ -3,11 +3,17 @@ import os
 from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.db.models import Count
 from django.db import connection
 from django.utils.encoding import smart_str
-from django.http import JsonResponse, StreamingHttpResponse, HttpResponse
+from django.http import (
+    JsonResponse,
+    StreamingHttpResponse,
+    HttpResponse,
+    Http404
+)
 from wsgiref.util import FileWrapper
 from django.shortcuts import (
     render,
@@ -15,17 +21,20 @@ from django.shortcuts import (
     get_object_or_404,
 )
 from django.urls import reverse
+from django.db.models import Q
 from django.views.decorators.http import require_http_methods
 from .forms import (
     AdicionarFiltroForm,
     FiltroForm,
     AdicionarClasseForm,
     ItemFiltroForm,
+    # FiltroNumProcessos,
 )
-from .models import (
+from filtro.models import (
     Filtro,
     ClasseFiltro,
-    ItemFiltro
+    ItemFiltro,
+    UsuarioAcessoFiltro
 )
 from .tasks import (
     submeter_classificacao,
@@ -35,17 +44,22 @@ from .tasks import (
 from .task_utils.functions import montar_estrutura_filtro
 
 
-def obter_filtro(idfiltro, username):
+def obter_filtro(idfiltro, username, responsavel=True):
+    base = obter_filtros(username, responsavel)
+
     return get_object_or_404(
-        Filtro,
-        pk=idfiltro,
-        responsavel=username)
-
-
-def obter_filtros(username):
-    return Filtro.objects.filter(
-        responsavel=username
+        base,
+        pk=idfiltro
     )
+
+
+def obter_filtros(username, responsavel=True):
+    if responsavel:
+        return Filtro.objects.filter(responsavel=username)
+
+    return Filtro.objects.filter(
+        (Q(responsavel=username) | Q(usuarioacessofiltro__usuario=username))
+    ).distinct()
 
 
 def dictfetchall(cursor):
@@ -71,6 +85,21 @@ def filtros(request):
     )
 
 
+@login_required
+def lista_usuarios(request):
+    term = request.GET.get("term")
+    usuarios_regulares = get_user_model().objects.filter(
+        ~Q(username=request.user.username),
+        username__icontains=term,
+        is_staff=False,
+        is_superuser=False,
+    )
+    return JsonResponse(
+        [str(u.username) for u in usuarios_regulares],
+        safe=False
+    )
+
+
 def obter_contadores_filtro(filtro):
     query = """select
         case when filtro_classefiltro.nome is null then 'Sem Classificação'
@@ -78,9 +107,10 @@ def obter_contadores_filtro(filtro):
         classe,
         count(classe) total
         from (
-        SELECT
+        SELECT distinct
         case when classe_filtro_id is null then 0
-        else classe_filtro_id end classe
+        else classe_filtro_id end classe,
+        numero
         FROM filtro_documento
         WHERE "filtro_documento"."filtro_id" = %s) tabela
         left join filtro_classefiltro on
@@ -148,6 +178,7 @@ def adicionar_filtro(request):
 def filtro(request, idfiltro):
     m_filtro = obter_filtro(idfiltro, request.user.username)
     form = FiltroForm(instance=m_filtro)
+    # form_proc = FiltroNumProcessos()
 
     if request.method == 'POST':
         form = FiltroForm(
@@ -165,10 +196,12 @@ def filtro(request, idfiltro):
         'filtro/filtro.html',
         {
             'form': form,
+            # 'form_proc': form_proc,
             'model': m_filtro,
             'idfiltro': idfiltro,
             'adicionarclasseform': AdicionarClasseForm(),
             'itemfiltroform': ItemFiltroForm(),
+            'is_filtro_owner': m_filtro.responsavel == request.user.username
         }
     )
 
@@ -176,7 +209,7 @@ def filtro(request, idfiltro):
 @login_required
 @require_http_methods(['POST'])
 def excuir_filtro(request):
-    idfiltro = request.POST.get('idfiltro')
+    idfiltro = request.POST.get('idfiltroexcluir')
 
     m_filtro = obter_filtro(idfiltro, request.user.username)
     m_filtro.delete()
@@ -238,11 +271,11 @@ def excluir_classe(request, idfiltro, idclasse):
     messages.warning(request, 'Classe de filtro removida')
 
     return redirect(
-            reverse(
-                'filtros-filtro',
-                args=[idfiltro]
-            )
+        reverse(
+            'filtros-filtro',
+            args=[idfiltro]
         )
+    )
 
 
 @login_required
@@ -296,6 +329,9 @@ def adicionar_itemfiltro(request):
             f_itemfiltro.save()
 
             messages.success(request, 'Item de Filtro adicionado!')
+
+    else:
+        messages.error(request, f_itemfiltro.errors["__all__"])
 
     return redirect(
         reverse(
@@ -389,15 +425,18 @@ def listar_resultados(request, idfiltro):
 
     sumario = obter_contadores_filtro(m_filtro)
 
-    total_classificados = documentos.all().exclude(
-        classe_filtro=None).count()
-    total_documentos = documentos.all().count()
+    total_classificados = sum(
+        item['total']
+        for item in sumario
+        if item['classe'] != 0
+    )
+    total_documentos = documentos.distinct('numero').count()
 
     for item in sumario:
         item['percentual_classe'] = 0 if not total_classificados \
-            else (item['total'] * 100.0)/total_classificados
+            else (item['total'] * 100.0) / total_classificados
         item['percentual_total'] = 0 if not total_documentos \
-            else (item['total'] * 100.0)/total_documentos
+            else (item['total'] * 100.0) / total_documentos
 
     if classe == 'T':
         documentos = documentos.all()
@@ -406,7 +445,7 @@ def listar_resultados(request, idfiltro):
     else:
         documentos = documentos.filter(classe_filtro=classe).all()
 
-    total = documentos.count()
+    total = documentos.distinct('numero').count()
     paginator = Paginator(documentos, 25)
 
     page = request.GET.get('page', 1)
@@ -422,7 +461,8 @@ def listar_resultados(request, idfiltro):
             'total_classificados': total_classificados,
             'total_documentos': total_documentos,
             'total': total,
-            'classe': classe
+            'classe': classe,
+            'mostra_lda': m_filtro.saida_lda is not None
         }
     )
 
@@ -475,3 +515,36 @@ def mediaview(request, mediafile):
 def explorar_lda(request, idfiltro):
     m_filtro = obter_filtro(idfiltro, request.user.username)
     return HttpResponse(m_filtro.saida_lda)
+
+
+@login_required
+@require_http_methods(['GET'])
+def get_usuarios_acessos(request, idfiltro):
+    m_filtro = obter_filtro(idfiltro, request.user.username, True)
+
+    return JsonResponse(
+        [
+            str(usuario.usuario)
+            for usuario in m_filtro.usuarioacessofiltro_set.all()
+        ],
+        safe=False
+    )
+
+
+@login_required
+@require_http_methods(['POST'])
+def adicionar_usuario_filtro(request, idfiltro):
+    m_filtro = obter_filtro(idfiltro, request.user.username, True)
+    username = request.POST.get('compartilhar_username')
+
+    if m_filtro.responsavel == request.user.username:
+        obj, created = UsuarioAcessoFiltro.objects.get_or_create(
+            filtro=m_filtro,
+            usuario=username
+        )
+
+        status = 200 if created else 400
+    else:
+        raise Http404
+
+    return JsonResponse({'created': created}, status=status)

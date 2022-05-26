@@ -4,7 +4,7 @@ from classificador_lyra.regex import constroi_classificador_dinamica
 from processostjrj.mni import consulta_processo, cria_cliente
 from slugify import slugify
 from filtro.models import Documento
-
+from filtro.task_utils.iniciais import processar as processar_iniciais
 
 logger = logging.getLogger(__name__)
 
@@ -20,26 +20,30 @@ def parse_documentos(m_filtro):
     return retorno
 
 
-def download_processos(documentos):
+def download_processos(documentos, trazer_iniciais=False):
     cliente = cria_cliente()
     for numero in documentos:
+        iniciais = []
+        f_numero = numero.strip().zfill(20)
         if not numero:
             continue
         try:
             processo = consulta_processo(
                 cliente,
-                numero.strip().zfill(20),
+                f_numero,
                 movimentos=True,
                 _value_1=[{"incluirCabecalho": True}]
             )
+            if trazer_iniciais:
+                iniciais = processar_iniciais(f_numero)
+
         except Exception as error:
             logger.error('Erro no download do processo %s' % numero, error)
             continue
-        yield processo
+        yield (numero, processo, iniciais)
 
 
-def parse_documento(params):
-    tipos_movimento, processo = params
+def parse_documento(tipos_movimento, processo):
     retorno = []
     if (not processo.sucesso or
             not processo.processo or
@@ -64,11 +68,10 @@ def parse_documento(params):
                 retorno.append(
                     (processo.processo.dadosBasicos.numero, tipo, inteiro_teor)
                 )
-
     return retorno
 
 
-def obtem_documentos_finais(pre_documentos, m_filtro):
+def obtem_documento_final(pre_documentos, m_filtro):
     for pre_documento in pre_documentos:
         m_documento = Documento()
         m_documento.filtro = m_filtro
@@ -78,11 +81,26 @@ def obtem_documentos_finais(pre_documentos, m_filtro):
         m_documento.save()
 
 
+def traduz_regex(termo):
+    """Modulo que traduz conectivos para caracter regex
+        Pagina para exemplo dos conectivos ==>>  https://scon.stj.jus.br/SCON/
+    """
+
+    dicionario = {"$": ".", "ou": "|"}
+    for origem, regex in dicionario.items():
+        termo = termo.replace(origem, regex)
+
+    return termo
+
+
 def transforma_em_regex(itemfiltro):
     if itemfiltro.regex:
         return '(%s)' % itemfiltro.termos
     else:
-        return '(%s)' % re.escape(itemfiltro.termos)
+
+        # return '(%s)' % re.escape(traduz_regex(itemfiltro.termos))
+        # Após alterações no sistemas, todos os termos deveram ser tratados como regex
+        return traduz_regex(itemfiltro.termos)
 
 
 def montar_estrutura_filtro(m_filtro, serializavel=False):

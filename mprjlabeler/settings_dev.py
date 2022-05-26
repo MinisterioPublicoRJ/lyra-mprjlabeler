@@ -39,9 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'livereload',
     'django.contrib.staticfiles',
-    'raven.contrib.django.raven_compat',
     'ordered_model',
     'labeler',
     'filtro',
@@ -55,7 +53,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'livereload.middleware.LiveReloadScript',
 ]
 
 ROOT_URLCONF = 'mprjlabeler.urls'
@@ -137,10 +134,6 @@ AITJ_MPRJ_USERINFO = 'http://apps.mprj.mp.br/mpmapas/api/authenticate'
 LOGIN_URL = '/login/'
 
 
-RAVEN_CONFIG = {
-    'dsn': os.environ["RAVENURL"],
-}
-
 MESSAGE_TAGS = {
     messages.DEBUG: 'info',
     messages.INFO: 'info',
@@ -165,9 +158,15 @@ LOGGING = {
     },
 }
 
-CELERY_BROKER_URL=os.environ["CELERY_URL"]
-CELERY_TASK_QUEUE = os.environ["CELERY_QUEUE"]
+CELERY_BROKER_URL = config("CELERY_URL", None)
+CELERY_TASK_QUEUE = config("CELERY_QUEUE", None)
 
-if "AMBIENTE" in os.environ and os.environ["AMBIENTE"] == "producao":
-    # Parametros para rodar no heroku
+if config("AMBIENTE", None) == "producao":
     DEBUG = False
+
+
+ID_MNI = config("ID_MNI")
+SENHA_MNI = config("SENHA_MNI")
+
+NOME_FILTRO_PETICAO_INICIAL = "Petição inicial"
+MININUM_DOC_COUNT_LDA = config("MININUM_DOC_COUNT_LDA", cast=int, default=1_000)
