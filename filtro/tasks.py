@@ -60,12 +60,8 @@ def submeter_classificacao_tjrj(m_filtro, idfiltro):
     # Baixa os processos
     contador = 0
     logger.info("Vou baixar %s documentos" % len(numeros_documentos))
-    trazer_iniciais = tipos_movimento.filter(
-        nome=settings.NOME_FILTRO_PETICAO_INICIAL
-    ).exists()
-    for numero, processo, iniciais in download_processos(
-            numeros_documentos, trazer_iniciais=trazer_iniciais
-    ):
+    trazer_iniciais = tipos_movimento.filter(nome=settings.NOME_FILTRO_PETICAO_INICIAL).exists()
+    for numero, processo, iniciais in download_processos(numeros_documentos, trazer_iniciais=trazer_iniciais):
         contador += 1
         logger.info("Passo %s, processo %s" % (contador, numero))
 
@@ -73,9 +69,7 @@ def submeter_classificacao_tjrj(m_filtro, idfiltro):
             promessas = parse_documento(tipos_movimento, processo)
             obtem_documento_final(promessas, m_filtro)
             if iniciais:
-                obtem_documento_final(
-                    iniciais, m_filtro,
-                )
+                obtem_documento_final(iniciais, m_filtro, )
 
         except Exception as error:
             print(str(error))
