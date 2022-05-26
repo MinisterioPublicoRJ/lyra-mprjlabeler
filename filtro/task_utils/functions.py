@@ -6,7 +6,6 @@ from slugify import slugify
 from filtro.models import Documento
 from filtro.task_utils.iniciais import processar as processar_iniciais
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -82,11 +81,26 @@ def obtem_documento_final(pre_documentos, m_filtro):
         m_documento.save()
 
 
+def traduz_regex(termo):
+    """Modulo que traduz conectivos para caracter regex
+        Pagina para exemplo dos conectivos ==>>  https://scon.stj.jus.br/SCON/
+    """
+
+    dicionario = {"$": ".", "ou": "|"}
+    for origem, regex in dicionario.items():
+        termo = termo.replace(origem, regex)
+
+    return termo
+
+
 def transforma_em_regex(itemfiltro):
     if itemfiltro.regex:
         return '(%s)' % itemfiltro.termos
     else:
-        return '(%s)' % re.escape(itemfiltro.termos)
+
+        # return '(%s)' % re.escape(traduz_regex(itemfiltro.termos))
+        # Após alterações no sistemas, todos os termos deveram ser tratados como regex
+        return traduz_regex(itemfiltro.termos)
 
 
 def montar_estrutura_filtro(m_filtro, serializavel=False):
