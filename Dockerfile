@@ -12,7 +12,7 @@ COPY . /app
 RUN mkdir -p /media
 
 RUN pip --trusted-host=pypi.python.org --trusted-host=pypi.org --trusted-host=files.pythonhosted.org install -U pip
-RUN pip --trusted-host=pypi.python.org --trusted-host=pypi.org --trusted-host=files.pythonhosted.org install -r requirements-dev.txt
+RUN pip --trusted-host=pypi.python.org --trusted-host=pypi.org --trusted-host=files.pythonhosted.org install -r requirements.txt
 
 RUN python manage.py collectstatic --noinput
 
