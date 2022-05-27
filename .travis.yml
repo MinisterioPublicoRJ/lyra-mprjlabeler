@@ -2,12 +2,12 @@ language: python
 python:
   - "3.9"
 install:
-  pip install -r dev-requirements.txt;
+  pip install -r requirements-dev.txt;
 script:
-  - flake8 .
+  - flake8 . --count --exit-zero --max-complexity=16 --max-line-length=127 --statistics
   - coverage run manage.py test --settings=mprjlabeler.test_settings
 after_success:
   - codecov
 notifications:
   email:
-    - felipe.gomes.ferreira@gmail.com
+    - welington.souza@mprj.mp.br
