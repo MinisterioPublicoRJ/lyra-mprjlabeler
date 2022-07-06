@@ -85,21 +85,28 @@ def traduz_regex(termo):
     """Modulo que traduz conectivos para caracter regex
         Pagina para exemplo dos conectivos ==>>  https://scon.stj.jus.br/SCON/
     """
-
     dicionario = {"$": ".", "ou": "|"}
     for origem, regex in dicionario.items():
         termo = termo.replace(origem, regex)
+
+    """
+        Aqui eu testo se o ultimo caracter é '.' e troco por '\w*' que é mais cirúrgico.
+        Pego a string(palavra), do começo ate a penúltima letra e troco a última letra por '\w*'.
+        Não uso o replace que troca todos os '.' por '\w*'.  
+    """
+    if termos := ''.join(palavra[:-1] + "\w* " for palavra in termo.split() if palavra[-1] == "."):
+        termo = termos.strip()
 
     return termo
 
 
 def transforma_em_regex(itemfiltro):
     if itemfiltro.regex:
-        return '(%s)' % itemfiltro.termos
+        # return '(%s)' % itemfiltro.termos
+        return f'({itemfiltro.termos})'
     else:
-
         # return '(%s)' % re.escape(traduz_regex(itemfiltro.termos))
-        # Após alterações no sistemas, todos os termos deveram ser tratados como regex
+        # Após alterações nos sistemas, todos os termos deveram ser tratados como regex
         return traduz_regex(itemfiltro.termos)
 
 
