@@ -13,7 +13,7 @@ MANAGE_PID=$!
 
 trap ctrl_c INT
 
-#celery -A mprjlabeler worker -l info
+celery -A mprjlabeler worker -l info
 
 sleep 2
 echo Livereload $LIVERELOAD_PID
