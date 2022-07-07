@@ -1,40 +1,70 @@
-{% extends 'labeler/base.html' %}
-{% block body %}<body class="mini-sidebar fix-header">{% endblock %}
-{% block basecontent %}
-    <!-- Preloader -->
-    <div class="preloader">
-        <div class="cssload-speeding-wheel"></div>
+{% extends 'labeler/base.html' %} {% load static %} {% block basecontent %}
+<!-- Preloader -->
+<div class="preloader">
+  <div class="cssload-speeding-wheel"></div>
+</div>
+<section id="wrapper">
+  <div class="login-info">
+    <div class="login-info-texts">
+        <h2>Demandas coletivas</h2>
+        <p>
+          Proporciona a análise, distinção e classificação de processos no sistema
+          de justiça Fluminense de demandas repetitivas e de caráter coletivo.
+        </p>
     </div>
-    <section id="wrapper" class="login-register">
-        <div class="login-box">
-            <div class="white-box">
-                <form class="form-horizontal form-material" id="loginform" action="{% url 'login' %}" method="post">
-                    {% csrf_token %}
-                    <h3 class="box-title m-b-20">Lyra Labeler MPRJ</h3>
-                    <div class="form-group ">
-                        <div class="col-xs-12">
-                            <input class="form-control" type="text" required="" placeholder="Usuário" name="username">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-xs-12">
-                            <input class="form-control" type="password" required="" placeholder="Senha" name="password">
-                        </div>
-                    </div>
-                    <div class="form-group text-center m-t-20">
-                        <div class="col-xs-12">
-                            <button class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light" 
-                            type="submit">Log In</button>
-                        </div>
-                    </div>
-                    <div class="form-group m-b-0">
-                        <div class="col-sm-12 text-center">
-                            <p><a href="/admin/" class="text-primary m-l-5"><b>Administrativo</b></a></p>
-                        </div>
-                    </div>
-                </form>
-            </div>
+  </div>
+  <div class="login-box">
+    <form
+      class="form-horizontal form-material"
+      id="loginform"
+      action="{% url 'login' %}"
+      method="post"
+    >
+      {% csrf_token %}
+      <h3><span>LYRA</span> LABELER</h3>
+      <div class="form-group">
+        <div class="col-xs-12">
+          <input
+            class="form-control"
+            type="text"
+            required=""
+            placeholder="Usuário"
+            name="username"
+          />
         </div>
-    </section>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-12">
+          <input
+            class="form-control"
+            type="password"
+            required=""
+            placeholder="Senha"
+            name="password"
+          />
+        </div>
+      </div>
+      <div class="form-group text-center m-t-20">
+        <div class="col-xs-12">
+          <button
+            class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light"
+            type="submit"
+          >
+            Acessar ferramenta
+          </button>
+        </div>
+      </div>
+      <div class="form-group m-b-0">
+        <div class="col-sm-12 text-center">
+          <p>
+            <a href="/admin/" class="text-primary m-l-5"
+              ><p>Administrativo</p></a
+            >
+          </p>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
 
 {% endblock %}

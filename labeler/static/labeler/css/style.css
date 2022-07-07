@@ -89,12 +89,9 @@ html {
 }
 
 body {
-    background: #fff;
-    font-family: 'Open Sans', sans-serif;
+    background: #fff !important;
+    font-family: 'Poppins', sans-serif; 
     margin: 0;
-    overflow-x: hidden;
-    color: #8d9498;
-    font-weight: 400
 }
 
 h1,
@@ -4330,28 +4327,7 @@ table.focus-on tbody tr.focused th {
     line-height: 210px
 }
 
-.login-register {
-    background: url(../../plugins/images/login-register.jpg) center center/cover no-repeat!important;
-    height: 100%;
-    position: fixed
-}
 
-.login-box {
-    background: #fff;
-    width: 400px;
-    margin: 10% auto 0
-}
-
-.login-box .footer {
-    width: 100%;
-    left: 0;
-    right: 0
-}
-
-.login-box .social {
-    display: block;
-    margin-bottom: 30px
-}
 
 #recoverform {
     display: none
@@ -5835,9 +5811,6 @@ ul.list-icons li i {
     padding: 11px 20px 15px
 }
 
-#wrapper {
-    width: 100%
-}
 
 .page-wrapper {
     background: #f4f8f9;
@@ -5847,20 +5820,6 @@ ul.list-icons li i {
 .container-fluid {
     padding: 30px;
     padding-bottom: 0
-}
-
-.white-box {
-    background: #fff;
-    padding: 25px;
-    margin-bottom: 30px;
-    border: 1px solid #e5ebec;
-    border-radius: 4px
-}
-
-.white-box .box-title {
-    margin: 10px 0 12px;
-    font-weight: 600;
-    font-size: 18px
 }
 
 .info-box {
