@@ -35,6 +35,11 @@
 }
 .login-box input  {
     text-align: center;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    border-bottom: 1px solid #ccc;
 }
 .login-box span  {
     font-weight: bold;
