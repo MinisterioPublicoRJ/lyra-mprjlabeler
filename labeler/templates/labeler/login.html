@@ -5,12 +5,18 @@
 </div>
 <section id="wrapper">
   <div class="login-info">
+    <div class="box-logo-gadg">
+      <img src="{% static 'labeler/img/header_logo.png' %}">
+    </div>
     <div class="login-info-texts">
         <h2>Demandas coletivas</h2>
         <p>
           Proporciona a análise, distinção e classificação de processos no sistema
           de justiça Fluminense de demandas repetitivas e de caráter coletivo.
         </p>
+    </div>
+    <div class="box-logo-lupa">
+      <img src="{% static 'labeler/img/lupa.png' %}">
     </div>
   </div>
   <div class="login-box">
@@ -21,7 +27,7 @@
       method="post"
     >
       {% csrf_token %}
-      <h3><span>LYRA</span> LABELER</h3>
+        <img src="{% static 'labeler/img/logo_1.png' %}">
       <div class="form-group">
           <input
             class="form-control"

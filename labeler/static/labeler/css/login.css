@@ -4,6 +4,13 @@
     height: 100vh;
     grid-template-areas:'login-info login-box login-box'
 }
+.login-info img{
+    width: 110px;
+    height: 41px;
+    padding-left: 40px;
+    margin-top: -140px;
+}
+
 .login-info{
   max-width: 450px;
   background-color: #0F3B54;
@@ -11,9 +18,7 @@
   justify-content: center;
   flex-direction: column;
   text-align: left !important;
-}
-.login-info-texts{
-    margin-bottom: 180px;
+  position: relative;
 }
 .login-info h2, p{
   color: #E4F6F9;
@@ -49,10 +54,24 @@
     border: 0;
     text-transform: none;
 }
+.login-info-texts{
+    margin-bottom: 188px;
+}
 .login-box button:hover{
     background-color: #E8505B;
     opacity: 0.8;
     border: 0;
 }
-
-
+.box-logo-lupa{
+    margin: 0 auto;
+    position: absolute;
+}
+.box-logo-lupa img{
+    width: 340px;
+    height: 390px;
+    margin-top: 267px;
+}
+.login-box img{
+    width: 150px;
+    margin-bottom: 20px;
+}
