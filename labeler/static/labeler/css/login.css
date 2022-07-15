@@ -5,7 +5,7 @@
     grid-template-areas:'login-info login-box login-box'
 }
 .login-info img{
-    width: 110px;
+    width: 120px;
     height: 41px;
     padding-left: 40px;
     margin-top: -140px;
@@ -40,10 +40,12 @@
 }
 .login-box input  {
     text-align: center;
-    border-top: none;
-    border-left: none;
-    border-right: none;
+    border-top: 0 none;
+    border-left: 0 none;
+    border-right: 0 none;
+    box-shadow: 0 0 0 0;
     border-radius: 0;
+    outline: 0;
     border-bottom: 1px solid #ccc;
 }
 .login-box span  {
