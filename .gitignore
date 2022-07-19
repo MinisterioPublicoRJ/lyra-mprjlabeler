@@ -116,6 +116,8 @@ env.bak/
 venv.bak/
 pyvenv.cfg
 .venv_lyra
+venv_lyra
+
 
 # Spyder project settings
 .spyderproject
