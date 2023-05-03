@@ -21,7 +21,7 @@
   position: relative;
 }
 .login-info h2, p{
-  color: #E4F6F9;
+  color: #0F3B54 !important;
   padding-left: 40px;
 }
 .login-info p{
@@ -58,6 +58,12 @@
 }
 .login-info-texts{
     margin-bottom: 188px;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+.login-info-texts h3, strong{
+    color: #E4F6F9;
+    font-weight: 300;
 }
 .login-box button:hover{
     background-color: #E8505B;
