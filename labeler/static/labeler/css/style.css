@@ -5607,7 +5607,7 @@ ul.list-icons li i {
 .top-left-part {
     width: 265px;
     float: left;
-    background: rgba(0, 0, 0, .1)
+    background: none !important;
 }
 
 .top-left-part a {
