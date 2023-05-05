@@ -5607,7 +5607,7 @@ ul.list-icons li i {
 .top-left-part {
     width: 265px;
     float: left;
-    background: rgba(0, 0, 0, .1)
+    background: none !important;
 }
 
 .top-left-part a {
@@ -5619,11 +5619,10 @@ ul.list-icons li i {
 
 .navbar-header {
     width: 100%;
-    background: #0078bc;
-    background: -moz-linear-gradient(left, #0078bc 1%, #00beda 100%);
-    background: -webkit-linear-gradient(left, #0078bc 1%, #00beda 100%);
-    background: linear-gradient(to right, #0078bc 1%, #00beda 100%);
-    border: 0
+    background: #0F3B54 !important;
+    border: 0;
+    height: 70px;
+
 }
 
 .navbar-default {
@@ -5790,9 +5789,7 @@ ul.list-icons li i {
     padding: 11px 20px 15px
 }
 
-
 .page-wrapper {
-    background: #f4f8f9;
     padding-bottom: 60px
 }
 
@@ -7069,8 +7066,8 @@ ul.list-icons li i {
     height: 100%;
     top: 0;
     overflow-y: auto;
-    background: #fff;
-    border-right: 1px solid #e5ebec
+    background: #E4F6F9 !important;
+    border: none !important;
 }
 
 .sidebar .sidebar-nav.navbar-collapse {
@@ -7109,18 +7106,21 @@ ul.list-icons li i {
 .collapse.in {
     display: block
 }
-
 .sidebar-nav {
-    background: #fff
+    background: #E4F6F9 !important;
 }
-
 .sidebar-nav ul#side-menu {
-    margin: 0;
+    margin-top: 30;
     padding: 0
 }
-
-.sidebar-nav ul#side-menu li {
-    list-style: none
+.sidebar-nav ul#side-menu:hover {
+    background-color: #127A9B;
+}
+.sidebar-nav ul#side-menu li span:hover {
+    list-style: none;
+}
+.sidebar-nav ul#side-menu li a:hover {
+    color: #fff;
 }
 
 .sidebar-nav ul#side-menu li a {
@@ -16063,4 +16063,15 @@ ul.pro-amenities li span i {
     .numbered-bg .step-title {
         padding-right: 0
     }
+}
+.navbar-header-logos{
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+.navbar-header-logos img{
+    height: 35px;
+    margin-top: 10px;
+    margin-left:15px ;
+    margin-right: 15px ;
 }

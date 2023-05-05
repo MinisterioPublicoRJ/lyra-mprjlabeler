@@ -1,14 +1,13 @@
+{% extends 'labeler/base.html' %} {% load static %} {% block basecontent %}
 <nav class="navbar navbar-default navbar-static-top m-b-0">
     <div class="navbar-header">
-        <div class="top-left-part">
-            <a class="logo" href="/">
-                <b>
-                    Lyra
-                </b>
-                <span>
-                    Labeler <small>(Develop)</small>
-                </span>
-            </a>
+        <div class="navbar-header-logos">
+            <div class="top-left-part">
+                <img src="{% static 'labeler/img/logo_lyra_branco.png' %}">
+            </div>
+            <div class="top-right-part">
+                <img src="{% static 'labeler/img/header_logo.png' %}">
+            </div>
         </div>
         <a class="navbar-toggle font-20 hidden-sm hidden-md hidden-lg " href="javascript:void(0)" data-toggle="collapse" data-target=".navbar-collapse">
             <i class="fa fa-close fa-bars"></i>
@@ -22,3 +21,4 @@
         </ul>
     </div>
 </nav>
+{% endblock %}
