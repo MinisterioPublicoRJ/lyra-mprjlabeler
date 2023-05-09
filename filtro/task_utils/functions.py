@@ -81,21 +81,41 @@ def obtem_documento_final(pre_documentos, m_filtro):
         m_documento.save()
 
 
-def traduz_regex(termo):
-    """Modulo que traduz conectivos para caracter regex
-        Pagina para exemplo dos conectivos ==>>  https://scon.stj.jus.br/SCON/
+def converte_and_regex(termos):
+    """Transformar o conectivo '<espaço>e<espaço>' para '|'
+        -- cobran$a$ e indevid$ -> (cobran\w*a\w*|indevid\w*)
+        -- cobran$a$ e indevid$ e recebeu -> (cobran\w*a\w*|indevid\w*|recebeu)
     """
-    dicionario = {"$": ".", "ou": "|"}
+    # Cria um padrão de regex que procura por espaços em branco em ambos os lados dos caracteres 'e' ou 'E'
+    pattern = r'(\s*E\s* | \s*e\s*)'
+    # ##indevid$ OU $osangela OU cobran$a$|indevid$|recebeu OU COBRAN$A$|INDEVID$|RECEBEU
+    string_modificado = re.sub(pattern, '|', termos)
+
+    # Pega somente cobran$a$|indevid$|recebeu , COBRAN$A$|INDEVID$|RECEBEU
+    pattern_and = r"\S*\|\S*"
+    list_termos = tuple(re.findall(pattern_and, string_modificado))
+
+    # Adiciona os "()" nos termos.
+    for termo in list_termos:
+        string_modificado = string_modificado.replace(termo, f"({termo})")
+
+    return string_modificado
+
+def converte_negativa_regex(termos):
+    return str("Rosangela e recebeu e indevida ((?!cobrança).)*$")
+
+def traduz_regex(termo):
+    """Função que traduz conectivos para expressões regex
+        Página para exemplo dos conectivos ==>>  https://scon.stj.jus.br/SCON/
+
+        Testar as regex https://regex101.com/
+    """
+    # TODO melhora as expressões "and" e "ou" as duas são muito parecidas
+    dicionario = {"$": "\w*", " OU ": "|"}
+    termo = converte_and_regex(termo)
+
     for origem, regex in dicionario.items():
         termo = termo.replace(origem, regex)
-
-    """
-        Aqui eu testo se o ultimo caracter é '.' e troco por '\w*' que é mais cirúrgico.
-        Pego a string(palavra), do começo ate a penúltima letra e troco a última letra por '\w*'.
-        Não uso o replace que troca todos os '.' por '\w*'.  
-    """
-    if termos := ''.join(palavra[:-1] + "\w* " for palavra in termo.split() if palavra[-1] == "."):
-        termo = termos.strip()
 
     return termo
 
