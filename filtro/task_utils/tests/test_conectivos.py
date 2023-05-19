@@ -1,3 +1,4 @@
+import pytest
 from django.test import TestCase
 from filtro.task_utils.functions import traduz_regex, converte_and_regex, converte_negativa_regex
 
