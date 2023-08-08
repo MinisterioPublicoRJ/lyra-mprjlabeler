@@ -3,7 +3,7 @@ celery
 certifi
 chardet
 dj-database-url
-Django
+Django==4.1
 django-nested-admin
 django-ordered-model
 django-yamlfield
@@ -14,17 +14,18 @@ newrelic
 pdfminer.six
 psycopg2-binary
 pytz
-PyYAML
-sklearn
+PyYAML==3.10
+scikit-learn
 redis
 requests
 six
 tqdm
 urllib3
 whitenoise
-pyLDAvis==3.3.1
+#pyLDAvis==3.3.1
+pyLDAvis
 python-decouple
-processostjrj@git+https://github.com/MinisterioPublicoRJ/processostjrj.git@develop
+# processostjrj@git+https://github.com/MinisterioPublicoRJ/processostjrj.git@develop
 classificador-lyra@git+https://github.com/MinisterioPublicoRJ/classificador-lyra.git@develop
 
 

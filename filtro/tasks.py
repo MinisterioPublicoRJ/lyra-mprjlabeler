@@ -19,7 +19,7 @@ import chardet
 from .analysis import modelar_lda
 from .models import Documento, Filtro
 from .task_utils import (
-    download_processos,
+    # download_processos,
     limpar_documentos,
     montar_estrutura_filtro,
     obtem_classe,

@@ -1,7 +1,7 @@
 from .functions import (
     limpar_documentos,
     parse_documentos,
-    download_processos,
+    # download_processos,
     parse_documento,
     obtem_documento_final,
     montar_estrutura_filtro,
@@ -12,7 +12,7 @@ from .functions import (
 __all__ = [
     'limpar_documentos',
     'parse_documentos',
-    'download_processos',
+    # 'download_processos',
     'parse_documento',
     'obtem_documento_final',
     'montar_estrutura_filtro',

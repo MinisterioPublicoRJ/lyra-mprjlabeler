@@ -196,8 +196,8 @@ CLASSIFICADOR_CHUNKSIZE = config(
     cast=int
 )
 
-ID_MNI = config("ID_MNI")
-SENHA_MNI = config("SENHA_MNI")
+# ID_MNI = config("ID_MNI")
+# SENHA_MNI = config("SENHA_MNI")
 
 NOME_FILTRO_PETICAO_INICIAL = "Petição inicial"
 MININUM_DOC_COUNT_LDA = config("MININUM_DOC_COUNT_LDA", cast=int, default=1_000)
