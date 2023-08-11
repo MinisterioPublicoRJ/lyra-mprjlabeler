@@ -6,6 +6,16 @@ from slugify import slugify
 from filtro.models import Documento
 # from filtro.task_utils.iniciais import processar as processar_iniciais
 
+import os
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'mprjlabeler.settings'
+
+import django
+
+django.setup()
+
+from processos.models import ProcessosColetados
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,6 +28,15 @@ def parse_documentos(m_filtro):
     retorno = m_filtro.arquivo_documentos.readlines()
     m_filtro.arquivo_documentos.close()
     return retorno
+
+
+def obter_processos(documentos, trazer_iniciais=False):
+    for numero in documentos:
+        # f_numero = numero.strip().zfill(20)
+        iniciais = []
+        processo = ProcessosColetados.objects.using('proc_base').filter(processo_numero=numero)
+
+        yield (numero, processo, iniciais)
 
 
 # def download_processos(documentos, trazer_iniciais=False):

@@ -7,6 +7,7 @@ from .models import (
     ItemFiltro
 )
 
+
 # from filtro.task_utils.obter_num_processo import obter_list_cnpj_cpf
 
 
@@ -20,7 +21,8 @@ class BaseModelForm(forms.ModelForm):
                 field.widget.attrs['class'] = 'form-control'
             elif (type(field.widget) == forms.SelectMultiple
                   or type(field.widget) == forms.Select):
-                field.widget.attrs['class'] = 'selectpicker form-control'
+                # selectpicker
+                field.widget.attrs['class'] = 'form-control'
                 field.widget.attrs['data-style'] = 'form-control'
                 field.widget.attrs['title'] = 'Selecione as Opções Desejadas'
 
@@ -93,7 +95,6 @@ class ItemFiltroForm(BaseModelForm):
     class Meta:
         model = ItemFiltro
         fields = ['termos', 'tipo', 'regex']
-
 
 # class FiltroNumProcessos(forms.Form):
 #     """ """
