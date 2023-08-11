@@ -59,7 +59,8 @@ class Filtro(models.Model):
     saida_lda = models.TextField(null=True, blank=True)
     responsavel = models.CharField(max_length=50, default='')
     percentual_atual = models.FloatField(null=True, blank=True)
-    reu = models.CharField(max_length=100, choices=CNPJ_CPF, blank=True, null=True)
+    # reu = models.CharField(max_length=100, choices=CNPJ_CPF, blank=True, null=True)
+    reu = models.CharField(max_length=400, blank=True, null=True)
 
     def __str__(self):
         if self:

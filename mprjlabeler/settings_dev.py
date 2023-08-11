@@ -17,7 +17,6 @@ from django.contrib import messages
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
@@ -30,7 +29,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'ordered_model',
     'labeler',
     'filtro',
@@ -76,14 +75,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mprjlabeler.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
     'default': dj_database_url.config()
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -103,7 +100,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
@@ -117,7 +113,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
@@ -127,12 +122,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
-
 AUTH_MPRJ = 'http://apps.mprj.mp.br/mpmapas/api/authentication'
 AITJ_MPRJ_USERINFO = 'http://apps.mprj.mp.br/mpmapas/api/authenticate'
 LOGIN_URL = '/login/'
-
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'info',
@@ -163,7 +155,6 @@ CELERY_TASK_QUEUE = config("CELERY_QUEUE", None)
 
 if config("AMBIENTE", None) == "producao":
     DEBUG = False
-
 
 ID_MNI = config("ID_MNI")
 SENHA_MNI = config("SENHA_MNI")

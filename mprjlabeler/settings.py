@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 import sys
 import urllib
+from unipath import Path
 
 from dj_database_url import parse as db_url
 from django.contrib import messages
@@ -21,7 +22,9 @@ from dj_database_url import parse as dburl
 from kombu.utils.url import quote
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = Path(__file__).parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -44,10 +47,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'ordered_model',
     'labeler',
     'filtro',
+    'processos',
     'nested_admin',
+
 ]
 
 DEV_PARTY_APPS = [
@@ -109,7 +115,15 @@ default_dburl = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
 TESTING = sys.argv[1:2] == ['test']
 if not TESTING:
     DATABASES = {
-        'default': config('DATABASE_URL', default=default_dburl, cast=db_url)
+        'default': config('DATABASE_URL',
+                          default=default_dburl,
+                          cast=db_url),
+        'proc_base': config(
+            'DATABASE_PROCESSO',
+            default=default_dburl,
+            cast=db_url
+        ),
+
     }
 else:
     DATABASES = {
@@ -117,7 +131,13 @@ else:
                     "TEST": {
                         "NAME": os.path.join(BASE_DIR, "test_db.sqlite3"),
                     }
-                    }, }
+                    },
+        # 'proc_base': config(
+        #     'DATABASE_PROCESSO',
+        #     default=default_dburl,
+        #     cast=db_url
+        # ),
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -214,6 +234,68 @@ LOGGING = {
         'filtro': {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} - {pathname}:{funcName} --> {message}",
+            "style": "{",
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR.child("dominio_login.log"),
+            "formatter": "verbose",
+        },
+        "file_proxies": {
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR.child("proxies.log"),
+            "formatter": "verbose",
+        },
+        "querys_raw_file": {
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR.child("querys_raw.log"),
+            "formatter": "verbose",
+        },
+        "file_tmp": {
+            # 'level': 'WARNING',
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(BASE_DIR, "debug.log"),
+            "backupCount": 10,  # keep at most 10 log files
+            "maxBytes": 5242880,  # 5*1024*1024 bytes (5MB)
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file_tmp"],
+            "level": config("DJANGO_LOG_LEVEL", default="INFO"),
+        },
+        "proxies": {
+            "level": config("PROXIES_LOG_LEVEL", default="INFO"),
+            "formatter": "verbose",
+            "handlers": ["console", "file_proxies", "file_tmp"],
+            "propagate": True,
+        },
+        "dominio.login": {
+            "level": config("DOMINIO_LOG_LEVEL", default="INFO"),
+            "formatter": "verbose",
+            "handlers": ["console", "file", "file_tmp"],
+            "propagate": True,
+        },
+        "django.db.backends": {
+            "level": "DEBUG",
+            "handlers": ["querys_raw_file", "file_tmp"],
         },
     },
 }

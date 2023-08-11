@@ -20,6 +20,7 @@ from .analysis import modelar_lda
 from .models import Documento, Filtro
 from .task_utils import (
     # download_processos,
+    obter_processos,
     limpar_documentos,
     montar_estrutura_filtro,
     obtem_classe,
@@ -61,7 +62,8 @@ def submeter_classificacao_tjrj(m_filtro, idfiltro):
     contador = 0
     logger.info("Vou baixar %s documentos" % len(numeros_documentos))
     trazer_iniciais = tipos_movimento.filter(nome=settings.NOME_FILTRO_PETICAO_INICIAL).exists()
-    for numero, processo, iniciais in download_processos(numeros_documentos, trazer_iniciais=trazer_iniciais):
+    # for numero, processo, iniciais in download_processos(numeros_documentos, trazer_iniciais=trazer_iniciais):
+    for numero, processo, iniciais in obter_processos(numeros_documentos, trazer_iniciais=trazer_iniciais):
         contador += 1
         logger.info("Passo %s, processo %s" % (contador, numero))
 
@@ -221,8 +223,8 @@ def classificar_baixados(idfiltro):
 def aplicar_lda(m_filtro):
     conteudos = (
         m_filtro.documento_set.filter(classe_filtro__isnull=True)
-            .all()
-            .values_list("conteudo", flat=True)
+        .all()
+        .values_list("conteudo", flat=True)
     )
 
     if len(conteudos) >= settings.MININUM_DOC_COUNT_LDA:
