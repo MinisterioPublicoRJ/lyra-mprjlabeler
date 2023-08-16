@@ -1,4 +1,4 @@
-import pyLDAvis.sklearn
+import pyLDAvis._prepare
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -19,7 +19,8 @@ def modelar_lda(conteudos):
 
     lda.fit(features)
 
-    modelo = pyLDAvis.sklearn.prepare(lda, features, vectorizer_all)
+    # modelo = pyLDAvis.sklearn.prepare(lda, features, vectorizer_all)
+    modelo = pyLDAvis._prepare(lda, features, vectorizer_all)
 
     saida = pyLDAvis.prepared_data_to_html(modelo)
 
