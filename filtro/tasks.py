@@ -8,6 +8,7 @@ from tarfile import TarFile, TarInfo
 
 import urllib3
 from billiard.pool import Pool, cpu_count
+# from billiard.pool import Pool
 from celery import shared_task
 from classificador_lyra.regex import classifica_item_sequencial
 from django.conf import settings
@@ -18,7 +19,8 @@ import chardet
 from .analysis import modelar_lda
 from .models import Documento, Filtro
 from .task_utils import (
-    download_processos,
+    # download_processos,
+    obter_processos,
     limpar_documentos,
     montar_estrutura_filtro,
     obtem_classe,
@@ -27,14 +29,13 @@ from .task_utils import (
     parse_documentos,
     preparar_classificadores,
 )
+from filtro.task_utils.obter_num_processo import obter_numeros_processos
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 
 logger = logging.getLogger(__name__)
 # configuracao de tamanho maximo de campo csv disponivel na arquitetura
 csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
-
 
 SITUACOES_EXECUTORES = "246"
 
@@ -52,17 +53,17 @@ def submeter_classificacao_tjrj(m_filtro, idfiltro):
     )
 
     # Obtém todos os números de documentos
-    numeros_documentos = parse_documentos(m_filtro)
+    if m_filtro.reu:
+        numeros_documentos = obter_numeros_processos(m_filtro.reu)
+    else:
+        numeros_documentos = parse_documentos(m_filtro)
 
     # Baixa os processos
     contador = 0
     logger.info("Vou baixar %s documentos" % len(numeros_documentos))
-    trazer_iniciais = tipos_movimento.filter(
-        nome=settings.NOME_FILTRO_PETICAO_INICIAL
-    ).exists()
-    for numero, processo, iniciais in download_processos(
-        numeros_documentos, trazer_iniciais=trazer_iniciais
-    ):
+    trazer_iniciais = tipos_movimento.filter(nome=settings.NOME_FILTRO_PETICAO_INICIAL).exists()
+    # for numero, processo, iniciais in download_processos(numeros_documentos, trazer_iniciais=trazer_iniciais):
+    for numero, processo, iniciais in obter_processos(numeros_documentos, trazer_iniciais=trazer_iniciais):
         contador += 1
         logger.info("Passo %s, processo %s" % (contador, numero))
 
@@ -70,9 +71,7 @@ def submeter_classificacao_tjrj(m_filtro, idfiltro):
             promessas = parse_documento(tipos_movimento, processo)
             obtem_documento_final(promessas, m_filtro)
             if iniciais:
-                obtem_documento_final(
-                    iniciais, m_filtro,
-                )
+                obtem_documento_final(iniciais, m_filtro, )
 
         except Exception as error:
             print(str(error))
@@ -201,9 +200,9 @@ def classificar_baixados(idfiltro):
         % (settings.CLASSIFICADOR_CHUNKSIZE, cpu_count())
     )
     for documento in pool.imap(
-        classificar_paralelo,
-        iterador,
-        chunksize=settings.CLASSIFICADOR_CHUNKSIZE,
+            classificar_paralelo,
+            iterador,
+            chunksize=settings.CLASSIFICADOR_CHUNKSIZE,
     ):
         contador += 1
         m_filtro.percentual_atual = contador / qtd_documentos * 100

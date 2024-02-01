@@ -1,11 +1,20 @@
 import logging
 import re
 from classificador_lyra.regex import constroi_classificador_dinamica
-from processostjrj.mni import consulta_processo, cria_cliente
+# from processostjrj.mni import consulta_processo, cria_cliente
 from slugify import slugify
 from filtro.models import Documento
-from filtro.task_utils.iniciais import processar as processar_iniciais
+# from filtro.task_utils.iniciais import processar as processar_iniciais
 
+import os
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'mprjlabeler.settings'
+
+import django
+
+django.setup()
+
+from processos.models import ProcessosColetados
 
 logger = logging.getLogger(__name__)
 
@@ -21,27 +30,37 @@ def parse_documentos(m_filtro):
     return retorno
 
 
-def download_processos(documentos, trazer_iniciais=False):
-    cliente = cria_cliente()
+def obter_processos(documentos, trazer_iniciais=False):
     for numero in documentos:
+        # f_numero = numero.strip().zfill(20)
         iniciais = []
-        f_numero = numero.strip().zfill(20)
-        if not numero:
-            continue
-        try:
-            processo = consulta_processo(
-                cliente,
-                f_numero,
-                movimentos=True,
-                _value_1=[{"incluirCabecalho": True}]
-            )
-            if trazer_iniciais:
-                iniciais = processar_iniciais(f_numero)
+        processo = ProcessosColetados.objects.using('proc_base').filter(processo_numero=numero)
 
-        except Exception as error:
-            logger.error('Erro no download do processo %s' % numero, error)
-            continue
         yield (numero, processo, iniciais)
+
+
+# def download_processos(documentos, trazer_iniciais=False):
+#     from processostjrj.mni import consulta_processo, cria_cliente
+#     cliente = cria_cliente()
+#     for numero in documentos:
+#         iniciais = []
+#         f_numero = numero.strip().zfill(20)
+#         if not numero:
+#             continue
+#         try:
+#             processo = consulta_processo(
+#                 cliente,
+#                 f_numero,
+#                 movimentos=True,
+#                 _value_1=[{"incluirCabecalho": True}]
+#             )
+#             if trazer_iniciais:
+#                 iniciais = processar_iniciais(f_numero)
+#
+#         except Exception as error:
+#             logger.error('Erro no download do processo %s' % numero, error)
+#             continue
+#         yield (numero, processo, iniciais)
 
 
 def parse_documento(tipos_movimento, processo):
@@ -82,11 +101,77 @@ def obtem_documento_final(pre_documentos, m_filtro):
         m_documento.save()
 
 
+def converte_and_regex(termos):
+    """
+    Converte o conectivo "e" em "&" e aplica expressões regulares a uma string de termos.
+
+    Args:
+        termos (str): Uma string contendo os termos a serem processados.
+
+    Returns:
+        str: A string modificada após a aplicação das substituições e expressões regulares.
+
+    Example:
+        >>> converte_and_regex("termo1 e termo2")
+        '((?i)termo1) & ((?i)termo2)'
+
+    OBS:
+        Eu imagino que de para fazer uma função menor, porém preferir deixar dessa maneira
+        pelo meu conhecimento limitado, nesse momento, e que assim eu achei que ficaria
+        um codigo mais inclusivo.
+    """
+
+    # Substituir o conectivo " e " por "&"
+    string_modificado = re.sub(r'(\s*E\s* | \s*e\s*)', '&', termos)
+
+    # Encontrar todas as ocorrências de termos com "&"
+    pattern_and = r"\S*\&\S*"
+    list_termos = tuple(re.findall(pattern_and, string_modificado))
+
+    # Modificar a string substituindo os termos com "(?i)" e adicionando parênteses
+    for termo in list_termos:
+        # Adicionar "(?i)" para tornar a correspondência de termo insensível a maiúsculas e minúsculas
+        string_modificado = string_modificado.replace(termo, f"((?i){termo})")
+
+        # Adicionar parênteses em cada termo individual
+        for i in termo.split('&'):
+            string_modificado = string_modificado.replace(i, f"({i})")
+
+    # Remover o caractere "&" da string modificada
+    string_modificado = string_modificado.replace('&', '')
+
+    # Retornar a string modificada
+    return string_modificado
+
+
+def converte_negativa_regex(termos):
+    return "Rosangela e recebeu e indevida ((?!cobrança).)*$"
+
+
+def traduz_regex(termo):
+    """Função que traduz conectivos para expressões regex
+        Página para exemplo dos conectivos ==>>  https://scon.stj.jus.br/SCON/
+
+        Testar as regex https://regex101.com/
+    """
+    # TODO melhora as expressões "and" e "ou" as duas são muito parecidas
+    dicionario = {"$": r"\w*", " OU ": "|"}
+    termo = converte_and_regex(termo)
+
+    for origem, regex in dicionario.items():
+        termo = termo.replace(origem, regex)
+
+    return termo
+
+
 def transforma_em_regex(itemfiltro):
     if itemfiltro.regex:
-        return '(%s)' % itemfiltro.termos
+        # return '(%s)' % itemfiltro.termos
+        return f'({itemfiltro.termos})'
     else:
-        return '(%s)' % re.escape(itemfiltro.termos)
+        # return '(%s)' % re.escape(traduz_regex(itemfiltro.termos))
+        # Após alterações nos sistemas, todos os termos deveram ser tratados como regex
+        return traduz_regex(itemfiltro.termos)
 
 
 def montar_estrutura_filtro(m_filtro, serializavel=False):

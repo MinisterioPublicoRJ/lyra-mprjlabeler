@@ -5849,20 +5849,6 @@ ul.list-icons li i {
     padding-bottom: 0
 }
 
-.white-box {
-    background: #fff;
-    padding: 25px;
-    margin-bottom: 30px;
-    border: 1px solid #e5ebec;
-    border-radius: 4px
-}
-
-.white-box .box-title {
-    margin: 10px 0 12px;
-    font-weight: 600;
-    font-size: 18px
-}
-
 .info-box {
     background: #fff;
     padding: 40px 30px 35px 25px;

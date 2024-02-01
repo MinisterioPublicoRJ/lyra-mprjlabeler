@@ -1,0 +1,16 @@
+-r requirements.txt
+model-mommy
+ipdb
+ipython
+pylint
+pylint-django
+pylint-plugin-utils
+flake8
+httmock
+coverage
+docker
+docker-compose
+django-livereload-server
+pytest
+yapf
+SQLAlchemy

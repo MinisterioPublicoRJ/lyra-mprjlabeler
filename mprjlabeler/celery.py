@@ -17,3 +17,8 @@ app.conf.task_default_queue = settings.CELERY_TASK_QUEUE
 
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
+
+
+@app.task(bind=True)
+def debug_task(self):
+    print(f'Request: {self.request!r}')

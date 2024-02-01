@@ -89,12 +89,9 @@ html {
 }
 
 body {
-    background: #fff;
-    font-family: 'Open Sans', sans-serif;
+    background: #fff !important;
+    font-family: 'Poppins', sans-serif; 
     margin: 0;
-    overflow-x: hidden;
-    color: #8d9498;
-    font-weight: 400
 }
 
 h1,
@@ -1631,18 +1628,6 @@ ul.list-inline li h6 {
 
 label {
     font-weight: 500
-}
-
-.form-control {
-    background-color: #fff;
-    border: 1px solid #e5ebec;
-    border-radius: 0;
-    box-shadow: none;
-    color: #565656;
-    height: 38px;
-    max-width: 100%;
-    padding: 7px 12px;
-    transition: all 300ms linear 0s
 }
 
 .form-control:focus {
@@ -4132,15 +4117,6 @@ table.focus-on tbody tr.focused th {
     transition: background 0s ease-out 0s
 }
 
-.form-material .form-control,
-.form-material .form-control.focus,
-.form-material .form-control:focus {
-    background-image: linear-gradient(#4a23ad, #4a23ad), linear-gradient(rgba(255, 255, 255, .2), rgba(255, 255, 255, .2));
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    float: none
-}
 
 .form-material .form-control.focus,
 .form-material .form-control:focus {
@@ -4330,28 +4306,7 @@ table.focus-on tbody tr.focused th {
     line-height: 210px
 }
 
-.login-register {
-    background: url(../../plugins/images/login-register.jpg) center center/cover no-repeat!important;
-    height: 100%;
-    position: fixed
-}
 
-.login-box {
-    background: #fff;
-    width: 400px;
-    margin: 10% auto 0
-}
-
-.login-box .footer {
-    width: 100%;
-    left: 0;
-    right: 0
-}
-
-.login-box .social {
-    display: block;
-    margin-bottom: 30px
-}
 
 #recoverform {
     display: none
@@ -5652,7 +5607,7 @@ ul.list-icons li i {
 .top-left-part {
     width: 265px;
     float: left;
-    background: rgba(0, 0, 0, .1)
+    background: none !important;
 }
 
 .top-left-part a {
@@ -5664,11 +5619,10 @@ ul.list-icons li i {
 
 .navbar-header {
     width: 100%;
-    background: #0078bc;
-    background: -moz-linear-gradient(left, #0078bc 1%, #00beda 100%);
-    background: -webkit-linear-gradient(left, #0078bc 1%, #00beda 100%);
-    background: linear-gradient(to right, #0078bc 1%, #00beda 100%);
-    border: 0
+    background: #0F3B54 !important;
+    border: 0;
+    height: 70px;
+
 }
 
 .navbar-default {
@@ -5835,32 +5789,13 @@ ul.list-icons li i {
     padding: 11px 20px 15px
 }
 
-#wrapper {
-    width: 100%
-}
-
 .page-wrapper {
-    background: #f4f8f9;
     padding-bottom: 60px
 }
 
 .container-fluid {
     padding: 30px;
     padding-bottom: 0
-}
-
-.white-box {
-    background: #fff;
-    padding: 25px;
-    margin-bottom: 30px;
-    border: 1px solid #e5ebec;
-    border-radius: 4px
-}
-
-.white-box .box-title {
-    margin: 10px 0 12px;
-    font-weight: 600;
-    font-size: 18px
 }
 
 .info-box {
@@ -7131,8 +7066,8 @@ ul.list-icons li i {
     height: 100%;
     top: 0;
     overflow-y: auto;
-    background: #fff;
-    border-right: 1px solid #e5ebec
+    background: #E4F6F9 !important;
+    border: none !important;
 }
 
 .sidebar .sidebar-nav.navbar-collapse {
@@ -7171,18 +7106,21 @@ ul.list-icons li i {
 .collapse.in {
     display: block
 }
-
 .sidebar-nav {
-    background: #fff
+    background: #E4F6F9 !important;
 }
-
 .sidebar-nav ul#side-menu {
-    margin: 0;
+    margin-top: 30;
     padding: 0
 }
-
-.sidebar-nav ul#side-menu li {
-    list-style: none
+.sidebar-nav ul#side-menu:hover {
+    background-color: #127A9B;
+}
+.sidebar-nav ul#side-menu li span:hover {
+    list-style: none;
+}
+.sidebar-nav ul#side-menu li a:hover {
+    color: #fff;
 }
 
 .sidebar-nav ul#side-menu li a {
@@ -16125,4 +16063,15 @@ ul.pro-amenities li span i {
     .numbered-bg .step-title {
         padding-right: 0
     }
+}
+.navbar-header-logos{
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+.navbar-header-logos img{
+    height: 35px;
+    margin-top: 10px;
+    margin-left:15px ;
+    margin-right: 15px ;
 }

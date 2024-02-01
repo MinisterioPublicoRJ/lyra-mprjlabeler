@@ -11,13 +11,20 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import sys
+import urllib
+from unipath import Path
+
 from dj_database_url import parse as db_url
 from django.contrib import messages
 from decouple import config
+from dj_database_url import parse as dburl
+from kombu.utils.url import quote
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = Path(__file__).parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -31,7 +38,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,10 +47,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'ordered_model',
     'labeler',
     'filtro',
+    'processos',
     'nested_admin',
+
+]
+
+DEV_PARTY_APPS = [
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -57,6 +70,21 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+DEV_MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+]
+
+if config("AMBIENTE", None) == "desenvolvimento":
+    INSTALLED_APPS += DEV_PARTY_APPS
+    MIDDLEWARE += DEV_MIDDLEWARE
+
+    # necessário para o debug_toobar
+    INTERNAL_IPS = [
+        # ...
+        "127.0.0.1",
+        # ...
+    ]
 
 ROOT_URLCONF = 'mprjlabeler.urls'
 
@@ -79,17 +107,37 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mprjlabeler.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-DATABASES = {
-    'default': config(
-        'DATABASE_URL',
-        cast=db_url
-    )
-}
+default_dburl = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
 
+TESTING = sys.argv[1:2] == ['test']
+if not TESTING:
+    DATABASES = {
+        'default': config('DATABASE_URL',
+                          default=default_dburl,
+                          cast=db_url),
+        'proc_base': config(
+            'DATABASE_PROCESSO',
+            default=default_dburl,
+            cast=db_url
+        ),
+
+    }
+else:
+    DATABASES = {
+        'default': {'ENGINE': 'django.db.backends.sqlite3',
+                    "TEST": {
+                        "NAME": os.path.join(BASE_DIR, "test_db.sqlite3"),
+                    }
+                    },
+        # 'proc_base': config(
+        #     'DATABASE_PROCESSO',
+        #     default=default_dburl,
+        #     cast=db_url
+        # ),
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -109,7 +157,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
@@ -123,7 +170,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
@@ -133,12 +179,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
 AUTH_MPRJ = 'http://apps.mprj.mp.br/mpmapas/api/authentication'
 AITJ_MPRJ_USERINFO = 'http://apps.mprj.mp.br/mpmapas/api/authenticate'
 LOGIN_URL = '/login/'
 
-#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'info',
@@ -148,15 +193,22 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-CELERY_BROKER_URL = config("CELERY_URL", None)
+# # ### Celery
 CELERY_TASK_QUEUE = config("CELERY_QUEUE", None)
 
+broker = 'sqla+sqlite:///' + os.path.join(BASE_DIR, 'broker.sqlite')
+CELERY_BROKER_URL = config('CELERY_URL', default=broker)
 
 if config("AMBIENTE", None) == "producao":
     DEBUG = False
 
-DATA_UPLOAD_MAX_NUMBER_FIELDS = None
+    # ### Celery
+    CELERY_RESULT_BACKEND = 'db+sqlite:///' + os.path.join(BASE_DIR, 'results.sqlite')
+    CELERY_ACCEPT_CONTENT = ['json']
+    CELERY_TASK_SERIALIZER = 'json'
+    CELERY_RESULT_SERIALIZER = 'json'
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 CLASSIFICADOR_CHUNKSIZE = config(
     'CLASSIFICADOR_CHUNKSIZE',
@@ -164,9 +216,86 @@ CLASSIFICADOR_CHUNKSIZE = config(
     cast=int
 )
 
-
-ID_MNI = config("ID_MNI")
-SENHA_MNI = config("SENHA_MNI")
+# ID_MNI = config("ID_MNI")
+# SENHA_MNI = config("SENHA_MNI")
 
 NOME_FILTRO_PETICAO_INICIAL = "Petição inicial"
 MININUM_DOC_COUNT_LDA = config("MININUM_DOC_COUNT_LDA", cast=int, default=1_000)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'filtro': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} - {pathname}:{funcName} --> {message}",
+            "style": "{",
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR.child("dominio_login.log"),
+            "formatter": "verbose",
+        },
+        "file_proxies": {
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR.child("proxies.log"),
+            "formatter": "verbose",
+        },
+        "querys_raw_file": {
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR.child("querys_raw.log"),
+            "formatter": "verbose",
+        },
+        "file_tmp": {
+            # 'level': 'WARNING',
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(BASE_DIR, "debug.log"),
+            "backupCount": 10,  # keep at most 10 log files
+            "maxBytes": 5242880,  # 5*1024*1024 bytes (5MB)
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file_tmp"],
+            "level": config("DJANGO_LOG_LEVEL", default="INFO"),
+        },
+        "proxies": {
+            "level": config("PROXIES_LOG_LEVEL", default="INFO"),
+            "formatter": "verbose",
+            "handlers": ["console", "file_proxies", "file_tmp"],
+            "propagate": True,
+        },
+        "dominio.login": {
+            "level": config("DOMINIO_LOG_LEVEL", default="INFO"),
+            "formatter": "verbose",
+            "handlers": ["console", "file", "file_tmp"],
+            "propagate": True,
+        },
+        "django.db.backends": {
+            "level": "DEBUG",
+            "handlers": ["querys_raw_file", "file_tmp"],
+        },
+    },
+}

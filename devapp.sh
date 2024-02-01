@@ -4,14 +4,18 @@ function ctrl_c() {
     exit
 }
 
-python manage.py livereload --settings=mprjlabeler.settings_dev &
+#python manage.py livereload --settings=mprjlabeler.settings_dev &
+python manage.py livereload --settings=mprjlabeler.settings &
 LIVERELOAD_PID=$!
-python manage.py runserver 0.0.0.0:8080 --settings=mprjlabeler.settings_dev &
+#python manage.py runserver 0.0.0.0:8080 --settings=mprjlabeler.settings_dev &
+python manage.py runserver 0.0.0.0:8080 --settings=mprjlabeler.settings &
 MANAGE_PID=$!
 
 trap ctrl_c INT
 
-sleep 2 
+celery -A mprjlabeler worker -l info
+
+sleep 2
 echo Livereload $LIVERELOAD_PID
 echo Runserver $MANAGE_PID
 
