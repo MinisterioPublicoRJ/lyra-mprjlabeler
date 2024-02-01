@@ -6,6 +6,10 @@ services:
     image: 'postgres:9.5'
     expose:
       - 5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     volumes:
       - postgresdata:/var/lib/postgresql/data/
 
@@ -32,7 +36,10 @@ services:
   web:
     build: '.'
     image: 'websource'
-    command: './app.sh'
+    command: >
+      sh -c "
+             python manage.py migrate &&
+             ./app.sh"
     ports:
       - '0.0.0.0:8080:8080'
     volumes:
@@ -50,7 +57,9 @@ services:
       WORKER: 1
 #    volumes_from:
     volumes:
-      - web
+      - media:/media
+      - static:/static
+      - .:/app
     depends_on:
       - web
 

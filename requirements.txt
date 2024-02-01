@@ -14,7 +14,8 @@ newrelic
 pdfminer.six
 psycopg2-binary
 pytz
-PyYAML==3.10
+# PyYAML==3.10
+PyYAML
 scikit-learn
 redis
 requests
@@ -26,6 +27,8 @@ whitenoise
 #pyLDAvis==3.3.1
 pyLDAvis
 python-decouple
+slugify
+SQLAlchemy
 # processostjrj@git+https://github.com/MinisterioPublicoRJ/processostjrj.git@develop
 classificador-lyra@git+https://github.com/MinisterioPublicoRJ/classificador-lyra.git@develop
 
