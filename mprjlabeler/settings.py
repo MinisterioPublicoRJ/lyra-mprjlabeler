@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'filtro',
     'processos',
     'nested_admin',
+    'widget_tweaks',
+    'bootstrap4',
 
 ]
 
@@ -298,4 +300,14 @@ LOGGING = {
             "handlers": ["querys_raw_file", "file_tmp"],
         },
     },
+}
+
+
+BOOTSTRAP4 = {
+
+    'set_placeholder': False,
+
+    'error_css_class': 'has-error',
+
+    'success_css_class': '',
 }

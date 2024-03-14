@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.11
 
 RUN apt-get update \
     && apt-get -y install build-essential \
@@ -12,7 +12,7 @@ COPY . /app
 RUN mkdir -p /media
 
 RUN pip --trusted-host=pypi.python.org --trusted-host=pypi.org --trusted-host=files.pythonhosted.org install -U pip
-RUN pip --trusted-host=pypi.python.org --trusted-host=pypi.org --trusted-host=files.pythonhosted.org install -r requirements.txt
+RUN pip --trusted-host=pypi.python.org --trusted-host=pypi.org --trusted-host=files.pythonhosted.org install -r requirements-dev.txt
 
 RUN python manage.py collectstatic --noinput
 

@@ -44,55 +44,61 @@ from filtro.views import (
 )
 
 urlpatterns = [
-                  path('admin/', admin.site.urls),
-                  path('campanhas/', campanhas, name='campanhas'),
-                  path('campanhas/<int:idcampanha>/', campanha, name='campanha'),
-                  path('campanhas/<int:idcampanha>/pedirnovo/', campanha, {'pedirnovo': True}, name='nova_campanha'),
-                  path('login/', login, name='login'),
                   path('', index, name='index'),
+                  path('admin/', admin.site.urls),
+                  # path('campanhas/', campanhas, name='campanhas'),
+                  # path('campanhas/<int:idcampanha>/', campanha, name='campanha'),
+                  # path('campanhas/<int:idcampanha>/pedirnovo/', campanha, {'pedirnovo': True}, name='nova_campanha'),
+
+                  path('login/', login, name='login'),
                   path('logout/', logout, name='logout'),
                   path('api/tarefa/<int:idcampanha>/', tarefa, name='api_tarefa'),
-                  path('filtros/', filtros, name='filtros'),
-                  path('filtros/adicionar', adicionar_filtro, name='filtros-adicionar'),
-                  path('filtros/<int:idfiltro>', filtro, name='filtros-filtro'),
-                  path('filtros/excluir', excuir_filtro, name='filtros-excluir'),
-                  path('filtros/adicionar-classe/<int:idfiltro>', adicionar_classe, name='filtros-adicionar-classe'),
-                  path('filtros/excluir-classe-filtro/<int:idfiltro>/<int:idclasse>',
-                       excluir_classe,
-                       name='filtros-excluir-classe'
-                       ),
-                  path(
-                      ('filtros/mover-classe-filtro/<int:idfiltro>'
-                       '/<int:idclasse>/<str:direcao>'),
-                      mover_classe,
-                      name='filtros-mover-classe'
-                  ),
-                  path('filtros/adicionar-item-filtro/', adicionar_itemfiltro, name='filtros-adicionar-itemfiltro'),
-                  path('filtros/excluir-item-filtro/<int:idfiltro>/<int:iditemfiltro>',
-                       excluir_item_filtro,
-                       name='filtros-excluir-itemfiltro'
-                       ),
-                  path('filtros/classificar-filtro/<int:idfiltro>', classificar, name='filtros-classificar'),
-                  path('filtros/reaplicar-filtro/<int:idfiltro>', reaplicar_filtro, name='filtros-reaplicar'),
-                  path('filtros/obter-situacao-filtro/<int:idfiltro>', obter_situacao, name='filtros-obter-situacao'),
-                  path('filtros/visualizar-resultado-filtro/<int:idfiltro>',
-                       listar_resultados,
-                       name='filtros-visualizar-resultado'
-                       ),
-                  path('filtros/compactar-resultado-filtro/<int:idfiltro>',
-                       executar_compactacao,
-                       name='filtros-compactar-resultado'
-                       ),
-                  path('media/<str:mediafile>', mediaview, ),
-                  path('filtros/<int:idfiltro>/estrutura', baixar_estrutura, name='filtros-baixar-estrutura'),
-                  path('filtros/explorar_lda/<int:idfiltro>', explorar_lda, name='filtros-explorar-lda'),
-                  path('nested_admin/', include('nested_admin.urls')),
-                  path('filtros/<int:idfiltro>/acesso', get_usuarios_acessos, name='filtros-obter-usuarios'),
+                  path('filtros/', include('filtro.urls', namespace='filtros')),
+
+                  # path('filtros/', filtros, name='filtros'),
+                  # path('filtros/adicionar', adicionar_filtro, name='filtros-adicionar'),
+                  # path('filtros/<int:idfiltro>', filtro, name='filtros-filtro'),
+                  # path('filtros/excluir', excuir_filtro, name='filtros-excluir'),
+                  # path('filtros/adicionar-classe/<int:idfiltro>', adicionar_classe, name='filtros-adicionar-classe'),
+                  # path('filtros/excluir-classe-filtro/<int:idfiltro>/<int:idclasse>',
+                  #      excluir_classe,
+                  #      name='filtros-excluir-classe'
+                  #      ),
+                  # path(
+                  #     ('filtros/mover-classe-filtro/<int:idfiltro>'
+                  #      '/<int:idclasse>/<str:direcao>'),
+                  #     mover_classe,
+                  #     name='filtros-mover-classe'
+                  # ),
+                  # path('filtros/adicionar-item-filtro/', adicionar_itemfiltro, name='filtros-adicionar-itemfiltro'),
+                  # path('filtros/excluir-item-filtro/<int:idfiltro>/<int:iditemfiltro>',
+                  #      excluir_item_filtro,
+                  #      name='filtros-excluir-itemfiltro'
+                  #      ),
+                  # path('filtros/classificar-filtro/<int:idfiltro>', classificar, name='filtros-classificar'),
+                  # path('filtros/reaplicar-filtro/<int:idfiltro>', reaplicar_filtro, name='filtros-reaplicar'),
+                  # path('filtros/obter-situacao-filtro/<int:idfiltro>', obter_situacao, name='filtros-obter-situacao'),
+                  # path('filtros/visualizar-resultado-filtro/<int:idfiltro>',
+                  #      listar_resultados,
+                  #      name='filtros-visualizar-resultado'
+                  #      ),
+                  # path('filtros/compactar-resultado-filtro/<int:idfiltro>',
+                  #      executar_compactacao,
+                  #      name='filtros-compactar-resultado'
+                  #      ),
+                  # path('filtros/<int:idfiltro>/estrutura', baixar_estrutura, name='filtros-baixar-estrutura'),
+                  # path('filtros/explorar_lda/<int:idfiltro>', explorar_lda, name='filtros-explorar-lda'),
+
+                  # path('filtros/<int:idfiltro>/acesso', get_usuarios_acessos, name='filtros-obter-usuarios'),
                   path('usuarios/lista', lista_usuarios, name='lista-usuarios'),
-                  path('filtros/<int:idfiltro>/acesso-usuario',
-                       adicionar_usuario_filtro,
-                       name='adiciona-usuario-filtro'
-                       ),
+                  # path('filtros/<int:idfiltro>/acesso-usuario',
+                  #      adicionar_usuario_filtro,
+                  #      name='adiciona-usuario-filtro'
+                  #      ),
+
+                  path('media/<str:mediafile>', mediaview, ),
+                  path('nested_admin/', include('nested_admin.urls')),
+
                   #### DEV PARTY ####
                   path('__debug__/', include('debug_toolbar.urls')),
 

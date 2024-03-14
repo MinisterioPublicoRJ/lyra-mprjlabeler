@@ -4,7 +4,7 @@ from django import forms
 from .models import (
     Filtro,
     ClasseFiltro,
-    ItemFiltro
+    ItemFiltro, Documento
 )
 
 
@@ -32,23 +32,16 @@ class AdicionarFiltroForm(BaseModelForm):
 
     class Meta:
         model = Filtro
-        fields = ['nome']
+        fields = ['nome', 'status', 'tipo_raspador', 'tipos_movimento', 'arquivo_tabulado', 'arquivo_documentos']
+        widgets = {
+            'status': forms.RadioSelect(attrs={'class': 'inline'}),
+        }
 
-    estrutura = forms.FileField(required=False)
-
-
-class FiltroForm(BaseModelForm):
-    prefix = 'filtro'
-
-    class Meta:
-        model = Filtro
-        fields = [
-            'nome',
-            'tipo_raspador',
-            'tipos_movimento',
-            'arquivo_documentos',
-            'reu',
-        ]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tipo_raspador'].label = 'Tipo de Raspador'
+        self.fields['tipos_movimento'].label = 'Tipo de Movimento'
+        self.fields['arquivo_documentos'].label = 'Lista de Processos'
 
 
 class AdicionarClasseForm(BaseModelForm):
@@ -96,6 +89,7 @@ class ItemFiltroForm(BaseModelForm):
         model = ItemFiltro
         fields = ['termos', 'tipo', 'regex']
 
+
 # class FiltroNumProcessos(forms.Form):
 #     """ """
 #     cnpj = obter_list_cnpj_cpf()[:100]  # Limitando a 100 itens
@@ -108,3 +102,31 @@ class ItemFiltroForm(BaseModelForm):
 #         ),
 #         choices=cnpj,
 #     )
+
+
+# Filtro Form
+class FiltroForm(forms.ModelForm):
+    class Meta:
+        model = Filtro
+        fields = ['nome', 'situacao', 'status', 'tipo_raspador', 'tipos_movimento']
+
+
+# ClasseFiltro Form
+class ClasseFiltroForm(forms.ModelForm):
+    class Meta:
+        model = ClasseFiltro
+        fields = '__all__'
+
+
+# ItemFiltro Form
+class ItemFiltroForm(forms.ModelForm):
+    class Meta:
+        model = ItemFiltro
+        fields = '__all__'
+
+
+# Documento Form
+class DocumentoForm(forms.ModelForm):
+    class Meta:
+        model = Documento
+        fields = '__all__'

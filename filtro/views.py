@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.db.models import Count
 from django.db import connection
@@ -12,7 +14,7 @@ from django.http import (
     JsonResponse,
     StreamingHttpResponse,
     HttpResponse,
-    Http404
+    Http404, HttpResponseRedirect
 )
 from wsgiref.util import FileWrapper
 from django.shortcuts import (
@@ -20,9 +22,12 @@ from django.shortcuts import (
     redirect,
     get_object_or_404,
 )
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.db.models import Q
+from django.views import View
 from django.views.decorators.http import require_http_methods
+from django.views.generic import CreateView, ListView, DeleteView, UpdateView
+
 from .forms import (
     AdicionarFiltroForm,
     FiltroForm,
@@ -548,3 +553,115 @@ def adicionar_usuario_filtro(request, idfiltro):
         raise Http404
 
     return JsonResponse({'created': created}, status=status)
+
+
+class FiltroListView(LoginRequiredMixin, ListView):
+    model = Filtro
+    template_name = 'filtro/filtros.html'
+
+
+class CadastrarFiltro(LoginRequiredMixin, CreateView):
+    model = Filtro
+    form_class = AdicionarFiltroForm
+    success_url = reverse_lazy('filtro:list')
+
+    def get_success_url(self):
+        return reverse('filtros:alterar', args=[self.object.id])
+
+    def form_valid(self, form):
+        form = AdicionarFiltroForm(self.request.POST, self.request.FILES)
+        form.instance.responsavel = self.request.user.username
+
+        form.save()
+
+        messages.success(
+            self.request,
+            "Filtro %s adicionado e salvo" % form.instance.nome)
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            "Erro ao adicionar filtro: %s" % form.errors
+        )
+
+        return super().form_invalid(form)
+
+
+class AlterarFiltro(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = Filtro
+    form_class = AdicionarFiltroForm
+    success_url = reverse_lazy('filtro:list')
+    success_message = 'Filtro alterado com sucesso!'
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            "Erro ao adicionar filtro: %s" % form.errors
+        )
+
+        return super().form_invalid(form)
+
+
+class ExcluirFiltro(LoginRequiredMixin, DeleteView):
+    model = Filtro
+    success_url = reverse_lazy('filtros')
+
+    def get(self, request, *args, **kwargs):
+        object = self.get_object()
+
+        for classe in object.classefiltro_set.all():
+            classe.itemfiltro_set.all().delete()
+            classe.delete()
+
+        object.delete()
+
+        messages.success(
+            request, 'Filtro removido com sucesso!'
+        )
+
+        return HttpResponseRedirect(reverse('filtro:list'))
+
+
+class ClasseCreateView(View):
+    def post(self, request):
+        if request.is_ajax():
+            # Assuming you have a form named 'createClasseForm' with appropriate fields
+            form = CreateClasseForm(request.POST)
+            if form.is_valid():
+                classe = form.save(commit=False)
+                # Additional logic if needed
+                classe.save()
+                return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+
+class ClasseUpdateView(View):
+    def post(self, request, pk):
+        classe = get_object_or_404(ClasseFiltro, pk=pk)
+        if request.is_ajax():
+            form = UpdateClasseForm(request.POST, instance=classe)
+            if form.is_valid():
+                form.save()
+                return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+
+class ClasseDeleteView(View):
+    def post(self, request, pk):
+        classe = get_object_or_404(ClasseFiltro, pk=pk)
+        if request.is_ajax():
+            classe.delete()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False}, status=400)
+
+
+class GetClasseDataView(View):
+    def get(self, request):
+        classes = ClasseFiltro.objects.filter(id=request.GET.get('id'))
+        data = [{'id': classe.pk, 'nome': classe.nome} for classe in classes]
+        return JsonResponse(data, safe=False)

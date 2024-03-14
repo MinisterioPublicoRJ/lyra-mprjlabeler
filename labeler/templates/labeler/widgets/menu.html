@@ -2,11 +2,11 @@
     <div class="scroll-sidebar">
         <nav class="sidebar-nav">
             <ul id="side-menu">
-                <!--<li>
-                    <a href="{% url 'campanhas' %}" aria-expanded="false"><i class="icon-docs fa-fw"></i> <span class="hide-menu">Classificador</span></a>
-                </li>-->
                 <li>
-                    <a href="{% url 'filtros' %}" aria-expanded="false"><i class="icon-magnifier fa-fw"></i> <span class="hide-menu">Pesquisar</span></a>
+                    <a href="{% url 'index' %}" aria-expanded="false"><i class="icon-home fa-fw"></i> <span class="hide-menu">Home</span></a>
+                </li>
+                <li>
+                    <a href="{% url 'filtros:list' %}" aria-expanded="false"><i class="icon-magnifier fa-fw"></i> <span class="hide-menu">Gerenciamento de Filtros</span></a>
                 </li>
             </ul>
         </nav>

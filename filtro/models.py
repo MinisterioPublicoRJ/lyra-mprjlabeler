@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from ordered_model.models import OrderedModel
 from .storages import OverwriteStorage
 
@@ -17,6 +18,10 @@ SITUACOES_FILTRO = (
     ('5', 'Documentos Classificados'),
     ('6', 'Compactando'),
     ('7', 'Download Disponível')
+)
+STATUS_FILTRO = (
+    ('1', 'Ativo'),
+    ('2', 'Inativo'),
 )
 
 TIPOS_FILTRO = (
@@ -53,8 +58,10 @@ class Filtro(models.Model):
     nome = models.CharField(max_length=50)
     tipo_raspador = models.CharField(max_length=1, choices=TIPOS_RASPADOR, blank=True, null=True)
     tipos_movimento = models.ManyToManyField('TipoMovimento', blank=True)
+    arquivo_tabulado = models.FileField(null=True, blank=True)
     arquivo_documentos = models.FileField(null=True, blank=True)
     situacao = models.CharField(max_length=1, choices=SITUACOES_FILTRO, default='1')
+    status = models.CharField(max_length=1, choices=STATUS_FILTRO, default='1')
     saida = models.FileField(null=True, blank=True, storage=OverwriteStorage())
     saida_lda = models.TextField(null=True, blank=True)
     responsavel = models.CharField(max_length=50, default='')
@@ -65,6 +72,14 @@ class Filtro(models.Model):
     def __str__(self):
         if self:
             return self.nome
+
+    @property
+    def get_absolute_url(self):
+        return reverse('filtro:alterar', args=[self.id])
+
+    @property
+    def get_delete_url(self):
+        return reverse('filtro:excluir', args=[self.id])
 
 
 class UsuarioAcessoFiltro(models.Model):

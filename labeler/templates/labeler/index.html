@@ -1,18 +1,32 @@
 {% extends 'labeler/base.html' %}
-{% block body %}<body class="mini-sidebar fix-header">{% endblock %}
+{% block body %}
+    <body class="mini-sidebar fix-header">{% endblock %}
 {% block basecontent %}
-<div id="wrapper">
-    <div class="preloader">
-        <div class="cssload-speeding-wheel"></div>
-    </div>
-    {% include 'labeler/widgets/topmenu.html'%}
-    {% include 'labeler/widgets/menu.html' %}
-    <div class="page-wrapper">
-        <div class="container-fluid">
-            {% block 'content' %}
-            {% endblock %}
+    <div id="">
+        <div class="preloader">
+            <div class="cssload-speeding-wheel"></div>
         </div>
+        {% include 'labeler/widgets/topmenu.html' %}
+        {% include 'labeler/widgets/menu.html' %}
+        <div class="page-wrapper">
+            <div class="container-fluid p-t-0 p-r-0">
+                {% block page_heading %}
+                    <div class="col-sm-12 p-0">
+                        <div class="panel panel-info p-l-0">
+                            <div class="panel-heading" style="text-transform: none">
+                                {% block page_heading_text %}
+                                <h2 class="text-white text-uppercase">Lyra Labeler</h2>
+                                <h6 class="text-white">O sistema Lyra é especializado na categorização de um amplo volume de processos e
+                                    decisões judiciais relacionadoa a problemas consumeristas recorrentes</h6>
+                                {% endblock %}
+                            </div>
+                        </div>
+                    </div>
+                {% endblock %}
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+        {% include 'labeler/widgets/sidemenu.html' %}
     </div>
-    {% include 'labeler/widgets/sidemenu.html' %}
-</div>
 {% endblock %}

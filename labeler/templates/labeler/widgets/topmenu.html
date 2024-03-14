@@ -1,24 +1,22 @@
-{% extends 'labeler/base.html' %} {% load static %} {% block basecontent %}
-<nav class="navbar navbar-default navbar-static-top m-b-0">
-    <div class="navbar-header">
-        <div class="navbar-header-logos">
-            <div class="top-left-part">
-                <img src="{% static 'labeler/img/logo_lyra_branco.png' %}">
+{% extends 'labeler/base.html' %}
+{% load static %}
+{% block basecontent %}
+    <nav class="navbar navbar-default navbar-static-top m-b-0">
+        <div class="navbar-header">
+            <div class="navbar-header-logos">
+                <div class="top-left-part">
+                    <img src="{% static 'labeler/img/logo_lyra_branco.png' %}">
+                </div>
+                <div class="top-right-part">
+                    <img src="{% static 'labeler/img/header_logo.png' %}">
+                </div>
             </div>
-            <div class="top-right-part">
-                <img src="{% static 'labeler/img/header_logo.png' %}">
-            </div>
+
+            <ul class="nav navbar-top-links navbar-right pull-right">
+                <li class="right-side-toggle">
+
+                </li>
+            </ul>
         </div>
-        <a class="navbar-toggle font-20 hidden-sm hidden-md hidden-lg " href="javascript:void(0)" data-toggle="collapse" data-target=".navbar-collapse">
-            <i class="fa fa-close fa-bars"></i>
-        </a>
-        <ul class="nav navbar-top-links navbar-right pull-right">
-            <li class="right-side-toggle">
-                <a class="right-side-toggler waves-effect waves-light b-r-0 font-20" href="javascript:void(0)">
-                    <i class="icon-settings"></i>
-                </a>
-            </li>
-        </ul>
-    </div>
-</nav>
+    </nav>
 {% endblock %}

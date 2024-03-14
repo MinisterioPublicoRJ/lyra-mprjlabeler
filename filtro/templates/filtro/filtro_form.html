@@ -1,0 +1,437 @@
+{% extends 'labeler/index.html' %}
+{% load tags_extras %}
+{% load widget_tweaks %}
+{% load bootstrap4 %}
+
+{% block page_heading_text %}
+    <h2 class="text-white text-uppercase"> Gerenciamento de Filtros | Cadastrar</h2>
+{% endblock %}
+
+{% block content %}
+    <form class=""
+          method="post"
+          enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row p-5">
+            <div class="col-md-12">
+                <div class="white-box">
+                    <h5 class="font-weight-bold">Informações básicas</h5>
+                    <div class="panel" style="border: 1px solid #eeee; border-radius: 15px">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    {% bootstrap_field form.nome %}
+                                </div>
+                                <div class="form-group col-sm-6" style="display: inline">
+                                    <div class="form-group col-sm-6" style="display: inline">
+                                        <div id="id_adicionar_filtro-status" class="inline m-t-15">
+
+                                            <label for="id_adicionar_filtro-status_0">
+                                                <input type="radio"
+                                                       name="adicionar_filtro-status"
+                                                       value="1"
+                                                       class="inline"
+                                                       required=""
+                                                       id="id_adicionar_filtro-status_0"
+                                                       checked="">
+                                                Ativo</label>
+
+
+                                            <label for="id_adicionar_filtro-status_1">
+                                                <input type="radio"
+                                                       name="adicionar_filtro-status"
+                                                       value="2"
+                                                       class="inline"
+                                                       required=""
+                                                       id="id_adicionar_filtro-status_1">
+                                                Inativo</label>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="white-box mt-5">
+                        <h5 class="font-weight-bold">Configurações da consulta</h5>
+                        <div class="panel" style="border: 1px solid #eeee; border-radius: 15px">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="form-group col-sm-6">
+                                        {% bootstrap_field form.tipo_raspador %}
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        {% bootstrap_field form.arquivo_tabulado %}
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        {% bootstrap_field form.tipos_movimento|add_class:'select2' %}
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        {% bootstrap_field form.arquivo_documentos %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="button"
+                                class="btn btn-outline-success waves-effect waves-light m-r-10"
+                                {% if not object %}
+                                disabled="disabled"
+                                title="Disponível após o salvamento do filtro"
+                                {% else %}
+                                data-toggle="modal"
+                                data-target="#adicionarClasseModal"
+                                onclick='adicionarClasse();'
+                                {% endif %}>
+                            <i class="fa fa-plus m-r-10"></i>
+                            Adicionar Classe de Filtro
+                        </button>
+                        {% if object %}
+                            <div id="classes" class="m-t-20 m-b-20">
+                                <div class="card">
+                                    <div class="card-header" id="headingOne">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <h5 class="mb-0">
+                                                    <button class="btn btn-link" data-toggle="collapse"
+                                                            data-target="#collapseOne"
+                                                            aria-expanded="true" type="button"
+                                                            aria-controls="collapseOne">
+                                                        Classe
+                                                    </button>
+                                                </h5>
+                                            </div>
+                                            <div class="col-sm-6 m-t-15 text-right">
+                                                <a href="">Editar Classe | </a>
+                                                <a href=""> Excluir Classe | </a>
+                                                <a href=""> Adicionar Termo</a>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                                         data-parent="#accordion">
+                                        <div class="card-body m-b-0 p-t-0 p-r-0 p-l-0">
+                                            <table class="table m-t-0">
+                                                <thead>
+                                                <tr>
+                                                    <th class="text-dark">Termo</th>
+                                                    <th class="text-dark">Tipo</th>
+                                                    <th class="text-dark">Ações</th>
+                                                </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% comment %}                 <a type="button"
+                       href='{% url "filtros-baixar-estrutura" idfiltro %}'
+                       class="btn btn-success waves-effect waves-light m-r-10"
+                       title="Baixa uma cópia da estrutura de filtros que pode ser utilizada na criação de novos filtros">
+                        <i class="fa fa-download m-r-10"></i>
+                        Baixar Estrutura
+                    </a>{% endcomment %}
+                        {% if is_filtro_owner %}
+                            <button type="button"
+                                    class="btn btn-default waves-effect waves-light m-r-10"
+                                    data-toggle="modal"
+                                    data-target="#compartilharFiltroModal"
+                                    onclick="">
+                                <i class="fa fa-share m-r-10"></i>
+                                Compartilhar Filtro
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <div class="text-right">
+                        <a href="{% url 'filtros:list' %}" class="btn btn-inverse waves-effect waves-light">Voltar</a>
+                        <button type="submit" class="btn btn-info waves-effect waves-light m-r-10">Salvar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- classes -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-info">
+                <div class="white-box user-table">
+                    {% for classe in model.classefiltro_set.all %}
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h3 class="box-title">
+                                    {{ classe.nome }}
+                                    <a href="#"
+                                       style="color: white;"
+                                       title="Adicionar Termos de Busca"
+                                       data-toggle="modal"
+                                       data-target="#adicionarItemFiltroModal"
+                                       onclick="adicionaritemfiltro({{ classe.id }})">
+                                        <i class="fa fa-plus text-success m-r-10"></i>
+                                    </a>
+                                </h3>
+                            </div>
+                            <div class="col-sm-6" style='text-align: right;'>
+                                <h3>
+                                    <a href="#" data-toggle="modal"
+                                       data-target="#adicionarClasseModal"
+                                       onclick='alterarClasse("{{ classe.id }}", "{{ classe.nome }}");'
+                                       title="Alterar Nome da Classe">
+                                        <i class="fa fa-pencil text-info m-r-10"></i>
+                                    </a>
+                                    <a href="#" data-toggle="modal"
+                                       data-target="#confirmarexclusaoclassemodal"
+                                       onclick='excluirclasse("{{ classe.nome }}", "{% url 'filtros-excluir-classe' idfiltro classe.id %}");'
+                                       title="Excluir Classe">
+                                        <i class="fa fa-trash text-danger m-r-10"></i>
+                                    </a>
+                                </h3>
+                            </div>
+                        </div>
+
+                        <div class="row table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th style="width:45%">Termos</th>
+                                    <th style="width:45%">Tipo</th>
+                                    <th style="width:5%">RegEx</th>
+                                    <th class="text-nowrap" style="width:5%">Ações</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for item in classe.itemfiltro_set.all %}
+                                    <tr>
+                                        <td>{{ item.termos }}</td>
+                                        <td>{{ item.get_tipo_display }}</td>
+                                        <td class="text-nowrap">
+                                            {% if item.regex %}
+                                                Sim
+                                            {% else %}
+                                                Não
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-nowrap">
+                                            <a href="#"
+                                               title="Alterar Termos de Busca"
+                                               data-toggle="modal"
+                                               data-target="#adicionarItemFiltroModal"
+                                               onclick="alteraritemfiltro({{ classe.id }}, {{ item.id }}, '{{ item.termos }}', '{{ item.tipo }}', '{{ item.regex }}' )">
+                                                <i class="fa fa-pencil text-inverse m-r-10"></i>
+                                            </a>
+                                            <a href="#"
+                                               title="Excluir Termos de Busca"
+                                               data-toggle="modal"
+                                               data-target="#confirmarexclusaoitemfiltromodal"
+                                               onclick="excluiritemfiltro('{% url 'filtros-excluir-itemfiltro' idfiltro item.id %}')">
+                                                <i class="fa fa-close text-danger m-r-10"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Adicionar Classe Modal-->
+    {% include 'filtro/componentes/modal_adicionarclasse.html' %}
+
+
+    <!-- adicionar item de filtro modal -->
+    {% include 'filtro/componentes/modal_adicionaritemfiltro.html' %}
+
+
+    <!-- Compartilhar filtro com outros usuários -->
+    {% include 'filtro/componentes/modal_compartilharfiltro.html' %}
+
+{% endblock %}
+
+{% block extrascripts %}
+
+    <script>
+        $(document).ready(function () {
+            // Function to populate table with class data
+            function populateTable() {
+                $.ajax({
+                    url: "{% url 'filtro:get_classe_data' %}",
+                    type: 'GET',
+                    success: function (response) {
+                        // Clear existing table data
+                        $('#classeTable tbody').empty();
+                        // Append data to the table
+                        $.each(response, function (index, classe) {
+                            $('#classeTable tbody').append(
+                                '<tr>' +
+                                '<td>' + classe.nome + '</td>' +
+                                '<td>' +
+                                '<button class="edit-btn" data-id="' + classe.id + '">Edit</button>' +
+                                '<button class="delete-btn" data-id="' + classe.id + '">Delete</button>' +
+                                '</td>' +
+                                '</tr>'
+                            );
+                        });
+                    }
+                });
+            }
+
+            // Call the populateTable function to load initial data
+            populateTable();
+
+            // Create button click event
+            $('#createClasseForm').on('submit', function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: "{% url 'filtro:classe_create' %}",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            populateTable(); // Refresh the table
+                            // Additional success actions if needed
+                        } else {
+                            // Handle form errors
+                            console.log(response.errors);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error response
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+
+            // Edit button click event
+            $(document).on('click', '.edit-btn', function () {
+                var classeId = $(this).data('id');
+                // Redirect to edit view or show modal for editing
+                window.location.href = "{% url 'filtro:classe_update' pk=0 %}".replace('0', classeId);
+            });
+
+            // Delete button click event
+            $(document).on('click', '.delete-btn', function () {
+                var classeId = $(this).data('id');
+                if (confirm('Are you sure you want to delete this class?')) {
+                    $.ajax({
+                        url: "{% url 'filtro:classe_delete' pk=0 %}".replace('0', classeId),
+                        type: "POST",
+                        data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                        success: function (response) {
+                            if (response.success) {
+                                populateTable(); // Refresh the table
+                                // Additional success actions if needed
+                            } else {
+                                // Handle delete failure
+                                console.log('Delete failed');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle error response
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+    <script>
+        const alterarTipoRaspador = () => {
+            const valor = document.querySelector('#{{form.tipo_raspador.auto_id}}').value
+            const fgpTiposMovimento = document.querySelector('#fgpTiposMovimento')
+            const lblArquivo = document.querySelector('#lblArquivo')
+            const $icoHelpArquivo = $('#icoHelpArquivo')
+
+            if (valor == 1) { // TJRJ
+                fgpTiposMovimento.style.display = 'block'
+                lblArquivo.innerHTML = "Lista de Processos"
+                $icoHelpArquivo.attr('data-target', "#helparquivo")
+            } else if (valor == 2) { // Arquivo Tabulado
+                fgpTiposMovimento.style.display = 'none'
+                lblArquivo.innerHTML = "Arquivo Tabulado"
+                $icoHelpArquivo.attr('data-target', "#helparquivotabulado")
+            }
+        }
+
+        $('#{{form.tipo_raspador.auto_id}}').on('changed.bs.select', alterarTipoRaspador)
+
+        alterarTipoRaspador()
+
+        $("#compartilhar_nome_usuario").autocomplete({
+            source: "/usuarios/lista",
+            minLength: 3,
+            delay: 750,
+            response: (event, ui) => {
+                console.log(event)
+            }
+        })
+
+        function getCookie(name) {
+            // Function to get any cookie available in the session.
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        };
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+            }
+        });
+
+        $("#compartilhar_form").on("submit", function (evt) {
+            evt.preventDefault();
+
+            const formData = new FormData(this);
+            $.ajax({
+                url: this.action,
+                type: "POST",
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (data) {
+                    $("#modal-msg-success").show();
+                    setTimeout(function () {
+                        $("#modal-msg-success").hide();
+                        $("#compartilhar_form").each(function () {
+                            this.reset()
+                        });
+                        $("#compartilharFiltroModal").modal("toggle");
+                    }, 1000)
+                },
+                error: function (data) {
+                    $("#modal-msg-error").show();
+                    setTimeout(function () {
+                        $("#modal-msg-error").hide();
+                    }, 2000)
+                }
+            })
+        })
+    </script>
+
+{% endblock %}
