@@ -9,6 +9,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.db.models import Count
 from django.db import connection
+from django.utils.decorators import method_decorator
 from django.utils.encoding import smart_str
 from django.http import (
     JsonResponse,
@@ -25,6 +26,7 @@ from django.shortcuts import (
 from django.urls import reverse, reverse_lazy
 from django.db.models import Q
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView
 
@@ -624,18 +626,16 @@ class ExcluirFiltro(LoginRequiredMixin, DeleteView):
         return HttpResponseRedirect(reverse('filtro:list'))
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ClasseCreateView(View):
     def post(self, request):
-        if request.is_ajax():
-            # Assuming you have a form named 'createClasseForm' with appropriate fields
-            form = CreateClasseForm(request.POST)
-            if form.is_valid():
-                classe = form.save(commit=False)
-                # Additional logic if needed
-                classe.save()
-                return JsonResponse({'success': True})
-            else:
-                return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+        nome = request.POST.get('nome')
+        filtro = request.POST.get('filtroId')
+        ClasseFiltro.objects.create(
+            nome=nome,
+            filtro_id=filtro
+        )
+        return JsonResponse({}, status=200)
 
 
 class ClasseUpdateView(View):
@@ -660,8 +660,9 @@ class ClasseDeleteView(View):
             return JsonResponse({'success': False}, status=400)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class GetClasseDataView(View):
     def get(self, request):
-        classes = ClasseFiltro.objects.filter(id=request.GET.get('id'))
-        data = [{'id': classe.pk, 'nome': classe.nome} for classe in classes]
+        classes = ClasseFiltro.objects.filter(filtro_id=request.GET.get('filtroId'))
+        data = [{'id': classe.pk, 'nome': classe.nome, 'termos': [{'id': termo.pk for termo in classe.itemfiltro_set.all()}]} for classe in classes]
         return JsonResponse(data, safe=False)

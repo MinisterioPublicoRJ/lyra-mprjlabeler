@@ -9,7 +9,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="recipient-name" class="control-label">Classe de filtro <b class="text-danger">*</b></label>
-                        <input type="text" class="form-control">
+                        <input type="text" id="nome" name="nome" class="form-control">
                     </div>
                 </div>
                 <div class="modal-footer b-0">
@@ -20,16 +20,3 @@
         </div>
     </div>
 </div>
-<script>
-    const adicionarClasse = () => {
-        document.querySelector('#adicionarClasseModalLabel1').innerHTML = 'Nova Classe de Filtro'
-        document.querySelector('#{{adicionarclasseform.nome.auto_id}}').value = ''
-        document.querySelector('#{{adicionarclasseform.idclasse.auto_id}}').value = null
-    }
-
-    const alterarClasse = (idClasse, valorAtual) => {
-        document.querySelector('#adicionarClasseModalLabel1').innerHTML = 'Atualizar Nome de Classe'
-        document.querySelector('#{{adicionarclasseform.nome.auto_id}}').value = valorAtual
-        document.querySelector('#{{adicionarclasseform.idclasse.auto_id}}').value = idClasse
-    }
-</script>
